@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA4</spirit:library>
+    <spirit:name>ATB</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:directConnection>true</spirit:directConnection>
+    <spirit:isAddressable>false</spirit:isAddressable>
+    <spirit:description>The ATB protocol is part of the AMBA 4 protocol family.
+The ATB protocol defines how trace information transfers between components in a trace system. The ATB is a common bus used by the trace components to pass format-independent trace data through a CoreSight system. A trace component or platform that has trace capabilities requires an ATB interface. The ATB interfaces are designated according to one of two functions:
+    Transmitter &gt; An interface that generates trace data on the ATB interface.
+    Receiver -&gt; An interface that receives trace data on the ATB interface.
+The ATB interface supports various features, including:
+    1- stalling of data, using valid and ready responses
+    2- control signals to indicate the number of bytes valid in a cycle
+    3- originating component marker, each data packet has an associated ID
+    4- any trace protocol information, data information or data format requirements
+    5- identification of data from all originating components
+    6- flushing
+    7- distribution of synchronization request</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:initiatorTerm>Transmitter</arm:initiatorTerm>
+        <arm:targetTerm>Receiver</arm:targetTerm>
+    </spirit:vendorExtensions>
+</spirit:busDefinition>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//============================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2022-2023 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//============================================================================
+-->
+<spirit:busDefinition xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd ">
+  <spirit:vendor>amba.com</spirit:vendor>
+  <spirit:library>AMBA5</spirit:library>
+  <spirit:name>ACE5-LiteACP</spirit:name>
+  <spirit:version>r0p2_0</spirit:version>
+  <spirit:directConnection>true</spirit:directConnection>
+  <spirit:isAddressable>true</spirit:isAddressable>
+  <spirit:extends spirit:library="AMBA5" spirit:name="AXI5" spirit:vendor="amba.com" spirit:version="r0p2_0"/>
+  <spirit:description>An ACE5-LiteACP interface is a simplified variant of AXI5 intended for use as a CPU accelerator coherency port. Reference: AMBA AXI Protocol Specification ARM IHI 0022 http://www.arm.com/support/AMBA.html</spirit:description>
+  <spirit:vendorExtensions>
+    <arm:revision>3</arm:revision>
+    <arm:initiatorTerm>Manager</arm:initiatorTerm>
+    <arm:targetTerm>Subordinate</arm:targetTerm>
+  </spirit:vendorExtensions>
+</spirit:busDefinition>

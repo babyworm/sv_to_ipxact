@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA5</spirit:library>
+    <spirit:name>CHI-B-RNI</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:directConnection>true</spirit:directConnection>
+    <spirit:isAddressable>true</spirit:isAddressable>
+    <spirit:description>The CHI RNI interface is used by IO coherent nodes such as GPUs and IO bridges. The RNI interface consists of the following VCs:
+ - TXREQ
+ - TXRSP
+ - RXRSP
+ - TXDAT
+ - RXDAT
+An RNI node sends request and response messages to the interconnect on the TXREQ and TXRSP channels respectively and receives response messages on RXRSP channel. The write data messages are sent on TXDAT and read data messages are received on RXDAT channel.
+For more information please refer to the AMBA5 CHI Architecture Specification ARM IHI 0050B : http://www.arm.com/support/AMBA.html</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>6</arm:revision>
+        <arm:initiatorTerm>Requester</arm:initiatorTerm>
+        <arm:targetTerm>Completer</arm:targetTerm>
+    </spirit:vendorExtensions>
+</spirit:busDefinition>

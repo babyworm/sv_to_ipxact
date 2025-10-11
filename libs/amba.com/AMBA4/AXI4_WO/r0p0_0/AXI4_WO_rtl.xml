@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//============================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2023 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//============================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+  <spirit:vendor>amba.com</spirit:vendor>
+  <spirit:library>AMBA4</spirit:library>
+  <spirit:name>AXI4_WO_rtl</spirit:name>
+  <spirit:version>r0p0_0</spirit:version>
+  <spirit:busType spirit:vendor="amba.com"  spirit:library="AMBA4" spirit:name="AXI4_WO" spirit:version="r0p0_0"/>
+  <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="AXI4_rtl" spirit:version="r0p0_0"/>
+  <spirit:ports>
+    <spirit:port>
+      <spirit:logicalName>ACLK</spirit:logicalName>
+      <spirit:description>Global clock signal. All signals are sampled on the rising edge of the global clock</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isClock>true</spirit:isClock>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:requiresDriver spirit:driverType="clock">true</spirit:requiresDriver>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ACLKEN</spirit:logicalName>
+      <spirit:description>Clock enable signal. Used as a qualifier for the ACLK signal. This signal indicates which rising edges of ACLK should be acted upon: 1 = valid rising edge of ACLK, 0 = any rising edge of ACLK should be ignored and no bus-state altered.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>1</spirit:defaultValue>
+      </spirit:wire>
+      <spirit:vendorExtensions>
+        <arm:isClockEnable>true</arm:isClockEnable>
+      </spirit:vendorExtensions>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARESETn</spirit:logicalName>
+      <spirit:description>Global reset signal. This signal is active LOW</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isReset>true</spirit:isReset>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:requiresDriver spirit:driverType="singleShot">true</spirit:requiresDriver>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWID</spirit:logicalName>
+      <spirit:description>Write address ID. This signal is the identification tag for the write address group of signals.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWADDR</spirit:logicalName>
+      <spirit:description>Write address. The write address bus gives the address of the first transfer in a write burst transaction. The associated control signals are used to determine the addresses of the remaining transfers in the burst.</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isAddress>true</spirit:isAddress>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWLEN</spirit:logicalName>
+      <spirit:description>Burst length. The burst length gives the exact number of transfers in a burst. This information determines the number of data transfers associated with the address.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>8</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>8</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWSIZE</spirit:logicalName>
+      <spirit:description>Burst size. This signal indicates the size of each transfer in the burst. Byte lane strobes indicate exactly which byte lanes to update.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>3</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>3</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+      <spirit:vendorExtensions>
+        <arm:defaultNotDefined>Unsupported</arm:defaultNotDefined>
+      </spirit:vendorExtensions>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWBURST</spirit:logicalName>
+      <spirit:description>Burst type. The burst type, coupled with the size information, details how the address for each transfer within the burst is calculated.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>1</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWLOCK</spirit:logicalName>
+      <spirit:description>Lock type. This signal provides additional information about the atomic characteristics of the transfer. The AMBA AXI4 Protocol does not support locked transfer sequences. This signal indicates an exclusive access (mapped to AxLOCK[0] from the AMBA AXI3 specification).</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWCACHE</spirit:logicalName>
+      <spirit:description>Cache type. This signal indicates the bufferable, cacheable, write-through, write-back, and allocate attributes of the transaction.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWPROT</spirit:logicalName>
+      <spirit:description>Protection type. This signal indicates the normal, privileged, or secure protection level of the transaction and whether the transaction is a data access or an instruction access.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>3</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>3</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWQOS</spirit:logicalName>
+      <spirit:description>Quality of service value. 4-bit QoS identifier sent on the write address channel for each write transaction</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWREGION</spirit:logicalName>
+      <spirit:description>Subordinate region identifier sent on the read address channel for each transaction</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isAddress>true</spirit:isAddress>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>4</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWVALID</spirit:logicalName>
+      <spirit:description>Write address valid. This signal indicates that valid write address and control information are available: 1 = address and control information available, 0 = address and control information not available. The address and control information remain stable until the address acknowledge signal, AWREADY, goes HIGH.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWREADY</spirit:logicalName>
+      <spirit:description>Write address ready. This signal indicates that the Subordinate is ready to accept an address and associated control signals: 1 = Subordinate ready, 0 = Subordinate not ready.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WDATA</spirit:logicalName>
+      <spirit:description>Write data. The write data bus can be 8, 16, 32, 64, 128, 256, 512, or 1024 bits wide</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+      <spirit:vendorExtensions>
+        <arm:defaultNotDefined>MatchPresenceAndWidth</arm:defaultNotDefined>
+      </spirit:vendorExtensions>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WSTRB</spirit:logicalName>
+      <spirit:description>Write strobes. This signal indicates which byte lanes to update in memory. There is one write strobe for each eight bits of the write data bus. </spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WLAST</spirit:logicalName>
+      <spirit:description>Write last. This signal indicates the last transfer in a write burst</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WVALID</spirit:logicalName>
+      <spirit:description>Write valid. This signal indicates that valid write data and strobes are available: 1 = write data and strobes available, 0 = write data and strobes not available.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WREADY</spirit:logicalName>
+      <spirit:description>Write ready. This signal indicates that the Subordinate can accept the write data: 1 = Subordinate ready, 0 = Subordinate not ready.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>BID</spirit:logicalName>
+      <spirit:description>Response ID. The identification tag of the write response. The BID value must match the AWID value of the write transaction to which the Subordinate is responding.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>BRESP</spirit:logicalName>
+      <spirit:description>Write response. This signal indicates the status of the write transaction. The allowable responses are OKAY, EXOKAY, SLVERR, and DECERR.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>BVALID</spirit:logicalName>
+      <spirit:description>Write response valid. This signal indicates that a valid write response is available: 1 = write response available, 0 = write response not available.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>BREADY</spirit:logicalName>
+      <spirit:description>Response ready. This signal indicates that the Manager can accept the response information. 1 = Manager ready, 0 = Manager not ready.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARID</spirit:logicalName>
+      <spirit:description>Read address ID. This signal is the identification tag for the read address group of signals.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARADDR</spirit:logicalName>
+      <spirit:description>Read address. The read address bus gives the initial address of a read burst transaction. Only the start address of the burst is provided and the control signals that are issued alongside the address detail how the address is calculated for the remaining transfers in the burst.</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isAddress>true</spirit:isAddress>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARLEN</spirit:logicalName>
+      <spirit:description>Burst length. The burst length gives the exact number of transfers in a burst. This information determines the number of data transfers associated with the address.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARSIZE</spirit:logicalName>
+      <spirit:description>Burst size. This signal indicates the size of each transfer in the burst</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARBURST</spirit:logicalName>
+      <spirit:description>Burst type. The burst type, coupled with the size information, details how the address for each transfer within the burst is calculated.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARLOCK</spirit:logicalName>
+      <spirit:description>Lock type. This signal provides additional information about the atomic characteristics of the transfer. The AMBA AXI4 Protocol does not support locked transfer sequences. This signal indicates an exclusive access (mapped to AxLOCK[0] from the AMBA AXI3 specification).</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARCACHE</spirit:logicalName>
+      <spirit:description>Cache type. This signal provides additional information about the cacheable characteristics of the transfer.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARPROT</spirit:logicalName>
+      <spirit:description>Protection type. This signal provides protection unit information for the transaction</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARQOS</spirit:logicalName>
+      <spirit:description>Quality of service value. 4-bit QoS identifier sent on the write address channel for each read transaction</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARREGION</spirit:logicalName>
+      <spirit:description>Subordinate region identifier sent on the read address channel for each transaction</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isAddress>true</spirit:isAddress>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARVALID</spirit:logicalName>
+      <spirit:description>Read address valid. This signal indicates, when HIGH, that the read address and control information is valid and will remain stable until the address acknowledge signal, ARREADY, is high.
+1 = address and control information valid, 0 = address and control information not valid.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARREADY</spirit:logicalName>
+      <spirit:description>Read address ready. This signal indicates that the Subordinate is ready to accept an address and associated control signals: 1 = Subordinate ready, 0 = Subordinate not ready.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RID</spirit:logicalName>
+      <spirit:description>Read ID tag. This signal is the ID tag of the read data group of signals. The RID value is generated by the Subordinate and must match the ARID value of the read transaction to which it is responding.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RDATA</spirit:logicalName>
+      <spirit:description>Read data. The read data bus can be 8, 16, 32, 64, 128, 256, 512, or 1024 bits wide</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RRESP</spirit:logicalName>
+      <spirit:description>Read response. This signal indicates the status of the read transfer. The allowable responses are OKAY, EXOKAY, SLVERR, and DECERR.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RLAST</spirit:logicalName>
+      <spirit:description>Read last. This signal indicates the last transfer in a read burst</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RVALID</spirit:logicalName>
+      <spirit:description>Read valid. This signal indicates that the required read data is available and the read transfer can complete: 1 = read data available, 0 = read data not available.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RREADY</spirit:logicalName>
+      <spirit:description>Read ready. This signal indicates that the Manager can accept the read data and response information: 1= Manager ready, 0 = Manager not ready.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>AWUSER</spirit:logicalName>
+      <spirit:description>Write Address User. This signal provides sideband signals on the write address channel which are valid at the same time as the other AW signals. Use of the AWUSER signal is implementation specific.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>WUSER</spirit:logicalName>
+      <spirit:description>Write User. This signal provides sideband signals on the write channel which are valid at the same time as the other W signals. Use of the WUSER signal is implementation specific.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>BUSER</spirit:logicalName>
+      <spirit:description>Write Response User. This signal provides sideband signals on the write response channel which are valid at the same time as the other B signals. Use of the BUSER signal is implementation specific.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>optional</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+        <spirit:defaultValue>0</spirit:defaultValue>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>ARUSER</spirit:logicalName>
+      <spirit:description>Read Address User. This signal provides sideband signals on the read address channel which are valid at the same time as the other AR signals. Use of the ARUSER signal is implementation specific.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>RUSER</spirit:logicalName>
+      <spirit:description>Read User. This signal provides sideband signals on the read channel which are valid at the same time as the other R signals. Use of the RUSER signal is implementation specific.</spirit:description>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>illegal</spirit:presence>
+          <spirit:direction>out</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+  </spirit:ports>
+  <spirit:description>This defines the signals when implementing an AXI4 WRITE-only interface on RTL views. For more information about AXI4 interfaces refer to the AMBA AXI Protocol Specification V2.0 (Arm IHI 0022C).</spirit:description>
+  <spirit:vendorExtensions>
+    <arm:parameters>
+      <arm:parameter>
+        <arm:name>write_interleaving_depth</arm:name>
+        <arm:displayName>Write Interleaving Depth</arm:displayName>
+        <arm:description>Potential lock-up if Manager tries to issue more than the Subordinate will accept.</arm:description>
+        <arm:onMaster>
+          <arm:presence>required</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>required</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:slave/spirit:parameters/spirit:parameter[spirit:name='write_interleaving_depth']/spirit:value &gt;= arm:master/spirit:parameters/spirit:parameter[spirit:name='write_interleaving_depth']/spirit:value</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>lock_support</arm:name>
+        <arm:displayName>Lock capability</arm:displayName>
+        <arm:description>AMBA AXI4 does not support lock. This rule ensures lock support is disabled.</arm:description>
+        <arm:onMaster>
+          <arm:presence>required</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>required</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:master/spirit:parameters/spirit:parameter[spirit:name='lock_support' and spirit:value='false'] and arm:slave/spirit:parameters/spirit:parameter[spirit:name='lock_support' and spirit:value='false']</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>read_reordering_depth</arm:name>
+        <arm:displayName>Maximum Reordered Reads</arm:displayName>
+        <arm:description>Risk of lock-up if Subordinate re-orders more than Manager can accept.</arm:description>
+        <arm:onMaster>
+          <arm:presence>illegal</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>illegal</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:slave/spirit:parameters/spirit:parameter[spirit:name='read_reordering_depth']/spirit:value &lt;= arm:master/spirit:parameters/spirit:parameter[spirit:name='read_reordering_depth']/spirit:value</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>write_reordering_depth</arm:name>
+        <arm:displayName>Maximum Reordered BResps</arm:displayName>
+        <arm:description>Risk of lock-up if Subordinate re-orders more than Manager can accept.</arm:description>
+        <arm:onMaster>
+          <arm:presence>required</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>required</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:slave/spirit:parameters/spirit:parameter[spirit:name='write_reordering_depth']/spirit:value &lt;= arm:master/spirit:parameters/spirit:parameter[spirit:name='write_reordering_depth']/spirit:value</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>outstanding_reads</arm:name>
+        <arm:displayName>Number of Outstanding Reads</arm:displayName>
+        <arm:description>Performance rather than function issue if wrong. Used to aid automatic configuration of buses and components</arm:description>
+        <arm:onMaster>
+          <arm:presence>illegal</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>illegal</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:master/spirit:parameters/spirit:parameter[spirit:name='outstanding_reads']/spirit:value = arm:slave/spirit:parameters/spirit:parameter[spirit:name='outstanding_reads']/spirit:value</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>outstanding_writes</arm:name>
+        <arm:displayName>Number of Outstanding Writes</arm:displayName>
+        <arm:description>Performance rather than function issue if wrong. Used to aid automatic configuration of buses and components</arm:description>
+        <arm:onMaster>
+          <arm:presence>optional</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>optional</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:master/spirit:parameters/spirit:parameter[spirit:name='outstanding_writes']/spirit:value = arm:slave/spirit:parameters/spirit:parameter[spirit:name='outstanding_writes']/spirit:value</arm:rule>
+      </arm:parameter>
+      <arm:parameter>
+        <arm:name>outstanding_transactions</arm:name>
+        <arm:displayName>Number of Outstanding Transactions</arm:displayName>
+        <arm:description>Performance rather than function issue if wrong. Used to aid automatic configuration of buses and components</arm:description>
+        <arm:onMaster>
+          <arm:presence>optional</arm:presence>
+        </arm:onMaster>
+        <arm:onSlave>
+          <arm:presence>optional</arm:presence>
+        </arm:onSlave>
+        <arm:rule>arm:master/spirit:parameters/spirit:parameter[spirit:name='outstanding_transactions']/spirit:value = arm:slave/spirit:parameters/spirit:parameter[spirit:name='outstanding_transactions']/spirit:value</arm:rule>
+      </arm:parameter>
+    </arm:parameters>
+    <arm:revision>4</arm:revision>
+    <arm:supportedSpecifications>
+      <arm:supportedSpecification>IHI0022D</arm:supportedSpecification>
+    </arm:supportedSpecifications>
+  </spirit:vendorExtensions>
+</spirit:abstractionDefinition>

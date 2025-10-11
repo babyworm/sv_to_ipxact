@@ -1,0 +1,7 @@
+lxml>=4.9.0
+pyverilog>=1.3.0
+
+# Development dependencies
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0

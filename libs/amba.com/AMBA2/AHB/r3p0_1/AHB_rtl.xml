@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA2</spirit:library>
+    <spirit:name>AHB_rtl</spirit:name>
+    <spirit:version>r3p0_1</spirit:version>
+    <spirit:busType spirit:vendor="amba.com" spirit:library="AMBA2" spirit:name="AHB" spirit:version="r3p0_1"/>
+    <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA3" spirit:name="AHBLite_rtl" spirit:version="r2p0_0"/>
+    <spirit:ports>
+        <spirit:port>
+            <spirit:logicalName>HCLK</spirit:logicalName>
+            <spirit:description>The bus clock times all bus transfers. All signal timings are related to the rising edge of HCLK.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isClock>true</spirit:isClock>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="clock">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HCLKEN</spirit:logicalName>
+            <spirit:description>Clock enable signal. Used as a qualifier for the HCLK signal. This signal indicates which rising edges of HCLK should be acted upon: 1 = valid rising edge of HCLK, 0 = any rising edge of HCLK should be ignored and no bus-state altered.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:isClockEnable>true</arm:isClockEnable>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HRESETn</spirit:logicalName>
+            <spirit:description>The bus reset signal is active LOW and resets the system and the bus. This is the only active LOW AHB signal.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isReset>true</spirit:isReset>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="singleShot">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HADDR</spirit:logicalName>
+            <spirit:description>The 32-bit system address bus, but the width is variable</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isAddress>true</spirit:isAddress>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>32</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>32</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HBURST</spirit:logicalName>
+            <spirit:description>The burst type indicates if the transfer is a single transfer or forms part of a burst. Fixed length bursts of 4, 8, and 16 beats are supported. The burst can be incrementing or wrapping. Incrementing bursts of undefined length are also supported.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>3</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>3</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HMASTLOCK</spirit:logicalName>
+            <spirit:description>When HIGH, this signal indicates that the current transfer is part of a locked sequence. It has the same timing as the HMASTER signal.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HPROT</spirit:logicalName>
+            <spirit:description>The protection control signals provide additional information about a bus access and are primarily intended for use by any module that wants to implement some level of protection. The signals indicate if the transfer is an opcode fetch or data access, and if the transfer is a privileged mode access or user mode access. For Managers with a memory management unit these signals also indicate whether the current access is cacheable or bufferable.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HSIZE</spirit:logicalName>
+            <spirit:description>Indicates the size of the transfer, that is typically byte, halfword, or word. The protocol allows for larger transfer sizes up to a maximum of 1024 bits.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>3</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>3</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HTRANS</spirit:logicalName>
+            <spirit:description>Indicates the transfer type of the current transfer. This can be: 1-IDLE, 2- BUSY, 3- NONSEQUENTIAL, 4- SEQUENTIAL</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>2</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>2</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HWDATA</spirit:logicalName>
+            <spirit:description>The write data bus transfers data from the Manager to the Subordinates during write operations. A minimum data bus width of 32 bits is recommended. However, this can be extended to enable higher bandwidth operation.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isData>true</spirit:isData>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HWRITE</spirit:logicalName>
+            <spirit:description>Indicates the transfer direction. When HIGH this signal indicates a write transfer and when LOW a read transfer. It has the same timing as the address signals, however, it must remain constant throughout a burst transfer.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HRDATA</spirit:logicalName>
+            <spirit:description>During read operations, the read data bus transfers data from the selected Subordinate to the multiplexor. The multiplexor then transfers the data to the Manager. A minimum data bus width of 32 bits is recommended. However, this can be extended to enable higher bandwidth operation.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isData>true</spirit:isData>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HREADYOUT</spirit:logicalName>
+            <spirit:description>When HIGH, the HREADYOUT signal indicates that a transfer has finished on the bus. This signal can be driven LOW to extend a transfer.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>illegal</spirit:presence>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HRESP</spirit:logicalName>
+            <spirit:description>The transfer response, after passing through the multiplexor, provides the Manager with additional information on the status of a transfer. Four different responses are provided, OKAY, ERROR, RETRY and SPLIT.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HSELx</spirit:logicalName>
+            <spirit:description>Each AHB Subordinate has its own Subordinate select signal HSELx and this signal indicates that the current transfer is intended for the selected Subordinate. When the Subordinate is initially selected, it must also monitor the status of HREADY to ensure that the previous bus transfer has completed, before it responds to the current transfer. The HSELx signal is a combinatorial decode of the address bus.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>illegal</spirit:presence>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HREADY</spirit:logicalName>
+            <spirit:description>When HIGH the HREADY signal indicates that a transfer has finished on the bus. This signal may be driven LOW to extend a transfer.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HBUSREQ</spirit:logicalName>
+            <spirit:description>This is a signal from bus Manager x to the bus arbiter which indicates that the bus Manager requires the bus. There is an HBUSREQx signal for each bus Manager in the system, up to a maximum of 16 bus Managers</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HLOCK</spirit:logicalName>
+            <spirit:description>When HIGH this signal indicates that the Manager requires locked access to the bus and no other Manager should be granted the bus until this signal is LOW.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HGRANT</spirit:logicalName>
+            <spirit:description>This signal indicates that bus Manager x is currently the highest priority Manager. Ownership of the address/control signals changes at the end of a transfer when HREADY is HIGH, so a Manager gets access to the bus when both HREADY and HGRANTx are HIGH.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>illegal</spirit:presence>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HMASTER</spirit:logicalName>
+            <spirit:description>These signals from the arbiter indicate which bus Manager is currently performing a transfer and is used by the Subordinates which support SPLIT transfers to determine which Manager is attempting an access. The timing of HMASTER is aligned with the timing of the address and control signals.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HSPLIT</spirit:logicalName>
+            <spirit:description>This bus is used by a Subordinate to indicate to the arbiter which bus Managers should be allowed to re-attempt a split transaction. Each bit of this split bus corresponds to a single bus Manager</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>illegal</spirit:presence>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HBSTRB</spirit:logicalName>
+            <spirit:description>These are the byte lane strobe signals. This is used for unaligned or mixed-endian data accesses to determine which byte lanes are active in a transfer. One bit of HBSTRB corresponds to eight bits of the data bus.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HRUSER</spirit:logicalName>
+            <spirit:description>This is an optional signal that is not part of the official specification and can be implemented based on specific user needs. The interpretation of this signal is user-defined.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HWUSER</spirit:logicalName>
+            <spirit:description>This is an optional signal that is not part of the official specification and can be implemented based on specific user needs. The interpretation of this signal is user-defined.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>HAUSER</spirit:logicalName>
+            <spirit:description>This is an optional signal that is not part of the official specification and can be implemented based on specific user needs. The interpretation of this signal is user-defined.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+    </spirit:ports>
+    <spirit:description>The current file describes the RTL view of an AHB interface. (Refer AMBA Specification Rev 2.0 - ARM IHI 0011A). Before an AMBA AHB transfer can commence the bus Manager must be granted access to the bus. This process is started by the Manager asserting a request signal to the arbiter. Then the arbiter indicates when the Manager will be granted use of the bus. A granted bus Manager starts an AMBA AHB transfer by driving the address and control signals. These signals provide information on the address, direction and width of the transfer, as well as an indication if the transfer forms part of a burst. Two different forms of burst transfers are allowed: incrementing bursts, which do not wrap at address boundaries. wrapping bursts, which wrap at particular address boundaries. A write data bus is used to move data from the Manager to a Subordinate while a read data bus is used to move data from a Subordinate to the Manager. Every transfer consists of: an address and control cycle one or more cycles for the data. The address cannot be extended and therefore all Subordinates must sample the address during this time. The data, however, can be extended using the HREADY signal. When LOW this signal causes wait states to be inserted into the transfer and allows extra time for the Subordinate to provide or sample data. During a transfer the Subordinate shows the status using the response signals, HRESP[1:0]: OKAY - The OKAY response is used to indicate that the transfer is progressing normally and when HREADY goes HIGH this shows the transfer has completed successfully. ERROR - The ERROR response indicates that a transfer error has occurred and the transfer has been unsuccessful. RETRY and SPLIT - Both the RETRY and SPLIT transfer responses indicate that the transfer cannot complete immediately, but the bus Manager should continue to attempt the transfer. In normal operation a Manager is allowed to complete all the transfers in a particular burst before the arbiter grants another Manager access to the bus. However, in order to avoid excessive arbitration latencies it is possible for the arbiter to break up a burst and in such cases the Manager must re-arbitrate for the bus in order to complete the remaining transfers in the burst.</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:supportedSpecifications>
+            <arm:supportedSpecification>IHI0011A</arm:supportedSpecification>
+        </arm:supportedSpecifications>
+    </spirit:vendorExtensions>
+</spirit:abstractionDefinition>

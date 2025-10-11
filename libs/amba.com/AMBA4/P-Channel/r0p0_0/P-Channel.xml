@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA4</spirit:library>
+    <spirit:name>P-Channel</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:directConnection>true</spirit:directConnection>
+    <spirit:isAddressable>false</spirit:isAddressable>
+    <spirit:description>The purpose of this interface is to prepare a device for certain power states.
+There are 2 signal groups:
+  activity indicators (PACTIVE[N-1:0]), and
+  the handshake signal group (PSTATE[M-1:0], PREQ, PACCEPT, and PDENY.
+PACTIVE[N-1:0] may be sparse or omitted.  PDENY is optional.
+For more information please refer to the AMBA Low Power Interface Specification ARM IHI 0068D : http://www.arm.com/support/AMBA.html</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:initiatorTerm>Controller</arm:initiatorTerm>
+        <arm:targetTerm>Device</arm:targetTerm>
+    </spirit:vendorExtensions>
+</spirit:busDefinition>

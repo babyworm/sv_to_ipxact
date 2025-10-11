@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//============================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2024 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//============================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+  <spirit:vendor>amba.com</spirit:vendor>
+  <spirit:library>AMBA4</spirit:library>
+  <spirit:name>ACP</spirit:name>
+  <spirit:version>r0p0_0</spirit:version>
+  <spirit:directConnection>true</spirit:directConnection>
+  <spirit:isAddressable>true</spirit:isAddressable>
+  <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="ACE-Lite" spirit:version="r0p0_0"/>
+  <spirit:description>The AMBA Accelerator Coherency Port Interface is defined in the AMBA spec as a subset of the ACE-Lite protocol. A number of ARM processors that have an Accelerator Coherency Port (ACP) use this subset. The ACP provides a port for local hardware accelerator components that benefit from an interface optimized for coherent cache line accesses.  For more information about ACP interface please refer to the AMBA AXI and ACE Protocol Specification (ARM IHI 0022E)</spirit:description>
+  <spirit:vendorExtensions>
+    <arm:parameterNames>
+      <arm:parameterName>write_interleaving_depth</arm:parameterName>
+      <arm:parameterName>lock_support</arm:parameterName>
+      <arm:parameterName>read_reordering_depth</arm:parameterName>
+      <arm:parameterName>write_reordering_depth</arm:parameterName>
+      <arm:parameterName>outstanding_reads</arm:parameterName>
+      <arm:parameterName>outstanding_writes</arm:parameterName>
+      <arm:parameterName>outstanding_transactions</arm:parameterName>
+    </arm:parameterNames>
+    <arm:revision>7</arm:revision>
+    <arm:initiatorTerm>Manager</arm:initiatorTerm>
+    <arm:targetTerm>Subordinate</arm:targetTerm>
+  </spirit:vendorExtensions>
+</spirit:busDefinition>

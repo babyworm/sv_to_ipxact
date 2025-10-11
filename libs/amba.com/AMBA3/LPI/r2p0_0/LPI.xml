@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA3</spirit:library>
+    <spirit:name>LPI</spirit:name>
+    <spirit:version>r2p0_0</spirit:version>
+    <spirit:directConnection>true</spirit:directConnection>
+    <spirit:isAddressable>false</spirit:isAddressable>
+    <spirit:description>This describes the AMBA AXI Low Power Interface (LPI)&lt;p/&gt;For more information about AXI interfaces refer to the AMBA AXI Protocol Specification V1.0 (ARM IHI 0022B).&lt;p/&gt;
+LPI enables controlled entry into and exit from a low-power state.&lt;p/&gt;
+AMBA AXI Protocol Specification v1.0 (ARM IHI 0022B) can be obtained from :&lt;p/&gt;
+http://infocenter.arm.com&lt;p/&gt;
+AMBA FAQ's :&lt;p/&gt;
+http://www.arm.com/support/AMBA.html&lt;p/&gt;
+LPI targets two different classes of peripherals:&lt;p/&gt;
+&lt;ul&gt;
+    &lt;li&gt;Peripherals that require a power-down sequence, and that can have their clocks turned off only after they enter a low-power state. These peripherals require an indication from a system clock controller to determine when to initiate the power-down sequence. &lt;/li&gt;
+    &lt;li&gt;Peripherals that have no power-down sequence, and that can independently indicate when it is acceptable to turn off their clocks.&lt;/li&gt;
+&lt;/ul&gt;&lt;p/&gt;</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>7</arm:revision>
+        <arm:initiatorTerm>Controller</arm:initiatorTerm>
+        <arm:targetTerm>Device</arm:targetTerm>
+    </spirit:vendorExtensions>
+</spirit:busDefinition>

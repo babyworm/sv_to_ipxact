@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2017-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA5</spirit:library>
+    <spirit:name>AXI5-Stream_rtl</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:busType spirit:vendor="amba.com" spirit:library="AMBA5" spirit:name="AXI5-Stream" spirit:version="r0p0_0"/>
+    <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="AXI4Stream_rtl" spirit:version="r0p0_1"/>
+    <spirit:ports>
+        <spirit:port>
+            <spirit:logicalName>ACLK</spirit:logicalName>
+            <spirit:description>Global clock signal. Synchronous signals are sampled on the rising edge of the global clock.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isClock>true</spirit:isClock>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="clock">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ACLKEN</spirit:logicalName>
+            <spirit:description>Clock enable signal. Used as a qualifier for the ACLK signal. This signal indicates which rising edges of ACLK should be acted upon: 1 = valid rising edge of ACLK, 0 = any rising edge of ACLK should be ignored and no bus-state altered.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:isClockEnable>true</arm:isClockEnable>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ACLKENCHK</spirit:logicalName>
+            <spirit:description>Check signal for ACLKEN.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>ACLKEN</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ARESETn</spirit:logicalName>
+            <spirit:description>Global reset signal. This signal is active LOW.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isReset>true</spirit:isReset>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="singleShot">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TVALID</spirit:logicalName>
+            <spirit:description>Indicates that the Transmitter is driving a valid transfer.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TREADY</spirit:logicalName>
+            <spirit:description>indicates that the Receiver can accept a transfer in the current cycle.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TDATA</spirit:logicalName>
+            <spirit:description>Primary payload that is used to provide the data that is passing across the interface.</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isData>true</spirit:isData>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TSTRB</spirit:logicalName>
+            <spirit:description>Byte qualifier that indicates whether the content of the associated byte of TDATA is processed as a data byte or a position byte.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:defaultNotDefined>Unsupported</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TKEEP</spirit:logicalName>
+            <spirit:description>Byte qualifier that indicates whether the content of the associated byte of TDATA is processed as part of the data stream.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TLAST</spirit:logicalName>
+            <spirit:description>Indicates the boundary of a packet.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TID</spirit:logicalName>
+            <spirit:description>Data stream identifier that indicates different streams of data.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TDEST</spirit:logicalName>
+            <spirit:description>Provides routing information for the data stream.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TUSER</spirit:logicalName>
+            <spirit:description>User defined sideband information that can be transmitted with the data stream.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TWAKEUP</spirit:logicalName>
+            <spirit:description>Wake-up signal, used to indicate that there is activity associated with an AXI-Stream interface.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TVALIDCHK</spirit:logicalName>
+            <spirit:description>Check signal for TVALID.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TVALID</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TREADYCHK</spirit:logicalName>
+            <spirit:description>Check signal for TREADY.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TREADY</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TDATACHK</spirit:logicalName>
+            <spirit:description>Check signal for TDATA.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TDATA</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TSTRBCHK</spirit:logicalName>
+            <spirit:description>Check signal for TSTRB.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TSTRB</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TKEEPCHK</spirit:logicalName>
+            <spirit:description>Check signal for TKEEP.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TKEEP</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TLASTCHK</spirit:logicalName>
+            <spirit:description>Check signal for TLAST.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TLAST</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TIDCHK</spirit:logicalName>
+            <spirit:description>Check signal for TID.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TID</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TDESTCHK</spirit:logicalName>
+            <spirit:description>Check signal for TDEST.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TDEST</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TUSERCHK</spirit:logicalName>
+            <spirit:description>Check signal for TUSER.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TUSER</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>TWAKEUPCHK</spirit:logicalName>
+            <spirit:description>Check signal for TWAKEUP.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>TWAKEUP</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+    </spirit:ports>
+    <spirit:description>This is an RTL Abstraction of the AMBA5/AXI5-Stream BusDefinition. For more information please refer to AMBA AXI-Stream Protocol Specification ARM IHI 0051B http://www.arm.com/support/AMBA.html</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>5</arm:revision>
+        <arm:supportedSpecifications>
+            <arm:supportedSpecification>IHI0051B</arm:supportedSpecification>
+        </arm:supportedSpecifications>
+    </spirit:vendorExtensions>
+</spirit:abstractionDefinition>

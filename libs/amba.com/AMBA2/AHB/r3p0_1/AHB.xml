@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA2</spirit:library>
+    <spirit:name>AHB</spirit:name>
+    <spirit:version>r3p0_1</spirit:version>
+    <spirit:directConnection>false</spirit:directConnection>
+    <spirit:isAddressable>true</spirit:isAddressable>
+    <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA3" spirit:name="AHBLite" spirit:version="r2p0_0"/>
+    <spirit:maxMasters>16</spirit:maxMasters>
+    <spirit:maxSlaves>16</spirit:maxSlaves>
+    <spirit:description>AMBA AHB addresses the requirements of high-performance synthesizable designs. (Refer AMBA Specification Rev 2.0 - ARM IHI 0011A) It is a bus interface that implements features required for high-performance, high clock frequency systems including :
+    - burst transfers
+    - split transactions
+    - single cycle bus Manager handover
+    - single clock edge operation
+    - non-tristate implementation
+    - wider data bus configurations (64/128 bits).</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:initiatorTerm>Manager</arm:initiatorTerm>
+        <arm:targetTerm>Subordinate</arm:targetTerm>
+    </spirit:vendorExtensions>
+</spirit:busDefinition>

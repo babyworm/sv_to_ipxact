@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA4</spirit:library>
+    <spirit:name>P-Channel_rtl</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:busType spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="P-Channel" spirit:version="r0p0_0"/>
+    <spirit:ports>
+        <spirit:port>
+            <spirit:logicalName>RESETn</spirit:logicalName>
+            <spirit:description>Active low reset</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isReset>true</spirit:isReset>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="singleShot">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PACTIVE</spirit:logicalName>
+            <spirit:description>Each power state supported by a device has an associated PACTIVE bit. The most significant PACTIVE bit set high indicates the minimum state required by the device. Each PACTIVE bit presented at a controller can be composed from a number of source signals. These can include, to provide wake-up capabilities, contributions from other devices dependent on the operational state of the interfaced device. Each PACTIVE bit must be driven either directly by a register or by a number of registers whose contributions are OR combined.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PSTATE</spirit:logicalName>
+            <spirit:description>Power state to which a transition is requested.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PREQ</spirit:logicalName>
+            <spirit:description>Active high request to transition to the power state indicated by PSTATE.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PACCEPT</spirit:logicalName>
+            <spirit:description>Active high acknowledgement of the power state transition request.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PDENY</spirit:logicalName>
+            <spirit:description>Active high denial of the power state transition request.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PACTIVECHK</spirit:logicalName>
+            <spirit:description>PACTIVECHK protects the optional port PACTIVE.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>PACTIVE</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PSTATECHK</spirit:logicalName>
+            <spirit:description>PSTATECHK protects the optional port PSTATE.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>PSTATE</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PREQCHK</spirit:logicalName>
+            <spirit:description>PREQCHK protects the optional port PREQ.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>PREQ</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PACCEPTCHK</spirit:logicalName>
+            <spirit:description>PACCEPTCHK protects the optional port PACCEPT.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>PACCEPT</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>PDENYCHK</spirit:logicalName>
+            <spirit:description>PDENYCHK protects the optional port PDENY.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>PDENY</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+    </spirit:ports>
+    <spirit:description>The purpose of this interface is to prepare a device for certain power states.
+There are 2 signal groups:
+  activity indicators (PACTIVE[N-1:0]), and
+  the handshake signal group (PSTATE[M-1:0], PREQ, PACCEPT, and PDENY.
+PACTIVE[N-1:0] may be sparse or omitted.  PDENY is optional.
+For more information please refer to the AMBA Low Power Interface Specification ARM IHI 0068D : http://www.arm.com/support/AMBA.html</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:supportedSpecifications>
+            <arm:supportedSpecification>IHI0068D</arm:supportedSpecification>
+        </arm:supportedSpecifications>
+    </spirit:vendorExtensions>
+</spirit:abstractionDefinition>

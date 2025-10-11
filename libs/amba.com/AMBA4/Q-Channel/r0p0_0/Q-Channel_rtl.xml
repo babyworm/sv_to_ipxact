@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA4</spirit:library>
+    <spirit:name>Q-Channel_rtl</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:busType spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="Q-Channel" spirit:version="r0p0_0"/>
+    <spirit:ports>
+        <spirit:port>
+            <spirit:logicalName>QACTIVE</spirit:logicalName>
+            <spirit:description>This signal is used to accept a request: when it is driven HIGH, it indicates that operations are in progress. When it is driven LOW, it is a hint, not a guarantee that the device may accept a quiescent request.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QREQn</spirit:logicalName>
+            <spirit:description>Quiescence request signal.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QACCEPTn</spirit:logicalName>
+            <spirit:description>This signal is used to accept a request.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QDENY</spirit:logicalName>
+            <spirit:description>This signal is used to deny a request.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QACTIVECHK</spirit:logicalName>
+            <spirit:description>QACTIVECHK protects the optional port QACTIVE.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>QACTIVE</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QREQCHK</spirit:logicalName>
+            <spirit:description>QREQCHK protects the optional port QREQn.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>QREQn</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QACCEPTCHK</spirit:logicalName>
+            <spirit:description>QACCEPTCHK protects the optional port QACCEPTn.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>QACCEPTn</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>QDENYCHK</spirit:logicalName>
+            <spirit:description>QDENYCHK protects the optional port QDENY.</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:checkPortReferences>
+                    <arm:checkPortReference>QDENY</arm:checkPortReference>
+                </arm:checkPortReferences>
+                <arm:defaultNotDefined>Unknown</arm:defaultNotDefined>
+            </spirit:vendorExtensions>
+        </spirit:port>
+    </spirit:ports>
+    <spirit:description>The purpose of this interface is the control of device quiescence.
+There are 2 signal groups:
+  the activity indicator (QACTIVE), and
+  the handshake signal group (QREQn, QACCEPTn, and QDENY).
+A QACTIVE only interface is supported.
+QACTIVE may be omitted if handshake signals are present.
+To support the handshake, both QREQn and QACCEPTn must be present, and QDENY is optional.
+For more information please refer to the AMBA Low Power Interface Specification ARM IHI 0068D : http://www.arm.com/support/AMBA.html</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:supportedSpecifications>
+            <arm:supportedSpecification>IHI0068D</arm:supportedSpecification>
+        </arm:supportedSpecifications>
+    </spirit:vendorExtensions>
+</spirit:abstractionDefinition>

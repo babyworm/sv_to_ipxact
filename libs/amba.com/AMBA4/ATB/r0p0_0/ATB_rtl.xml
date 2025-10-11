@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//================================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from Arm Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2025 Arm Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from Arm Limited or its affiliates.
+//================================================================================
+-->
+<spirit:abstractionDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+    <spirit:vendor>amba.com</spirit:vendor>
+    <spirit:library>AMBA4</spirit:library>
+    <spirit:name>ATB_rtl</spirit:name>
+    <spirit:version>r0p0_0</spirit:version>
+    <spirit:busType spirit:vendor="amba.com" spirit:library="AMBA4" spirit:name="ATB" spirit:version="r0p0_0"/>
+    <spirit:ports>
+        <spirit:port>
+            <spirit:logicalName>ATCLK</spirit:logicalName>
+            <spirit:description>ATB clock</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isClock>true</spirit:isClock>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="clock">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATCLKEN</spirit:logicalName>
+            <spirit:description>Enable signal for ATCLK domain</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+            <spirit:vendorExtensions>
+                <arm:isClockEnable>true</arm:isClockEnable>
+            </spirit:vendorExtensions>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATRESETn</spirit:logicalName>
+            <spirit:description>ATB interface reset when LOW. This signal is asserted LOW asynchronously, and deasserted HIGH synchronously</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isReset>true</spirit:isReset>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:requiresDriver spirit:driverType="singleShot">true</spirit:requiresDriver>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATBYTES</spirit:logicalName>
+            <spirit:description>The number of bytes on ATDATA to be captured, minus 1
+The relationship between the widths of ATBYTES[m:0] and ATDATA[n:0] is described by the equation:
+m = log2(n+1) - 4</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATDATA</spirit:logicalName>
+            <spirit:description>Trace data</spirit:description>
+            <spirit:wire>
+                <spirit:qualifier>
+                    <spirit:isData>true</spirit:isData>
+                </spirit:qualifier>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATID</spirit:logicalName>
+            <spirit:description>An ID that uniquely identifies the source of the trace</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>7</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>7</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATREADY</spirit:logicalName>
+            <spirit:description>Receiver is ready to accept data</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>ATVALID</spirit:logicalName>
+            <spirit:description>A transfer is valid during this cycle. If LOW, all other AT signals must be ignored this cycle</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>required</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>AFVALID</spirit:logicalName>
+            <spirit:description>This is the flush signal. All buffers must be flushed to remove old trace data</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>AFREADY</spirit:logicalName>
+            <spirit:description>This is a flush acknowledge. Asserted when buffers have old output data</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>1</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+        <spirit:port>
+            <spirit:logicalName>SYNCREQ</spirit:logicalName>
+            <spirit:description>This is the synchronisation request signal. It is asserted to request the insertion of synchronization information in the trace stream. A synchronisation request is indicated by a single-cycle pulse of the signal SYNCREQ HIGH</spirit:description>
+            <spirit:wire>
+                <spirit:onMaster>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>in</spirit:direction>
+                </spirit:onMaster>
+                <spirit:onSlave>
+                    <spirit:presence>optional</spirit:presence>
+                    <spirit:width>1</spirit:width>
+                    <spirit:direction>out</spirit:direction>
+                </spirit:onSlave>
+                <spirit:defaultValue>0</spirit:defaultValue>
+            </spirit:wire>
+        </spirit:port>
+    </spirit:ports>
+    <spirit:description>The current file describes the RTL view of an ATB interface</spirit:description>
+    <spirit:vendorExtensions>
+        <arm:revision>8</arm:revision>
+        <arm:supportedSpecifications>
+            <arm:supportedSpecification>IHI0032B</arm:supportedSpecification>
+        </arm:supportedSpecifications>
+    </spirit:vendorExtensions>
+</spirit:abstractionDefinition>
