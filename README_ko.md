@@ -36,6 +36,12 @@ sv_to_ipxact -i design.sv -o output.xml
 # 라이브러리 캐시 재생성
 sv_to_ipxact -i design.sv --rebuild
 
+# IP-XACT 2009 표준 사용
+sv_to_ipxact -i design.sv --ipxact-2009
+
+# 생성된 IP-XACT 파일 유효성 검사
+sv_to_ipxact -i design.sv --validate
+
 # 상세 출력
 sv_to_ipxact -i design.sv -v
 ```
@@ -43,11 +49,13 @@ sv_to_ipxact -i design.sv -v
 ### 옵션
 
 - `-i, --input`: 입력 SystemVerilog 파일 (필수)
-- `-o, --output`: 출력 IP-XACT 파일 (기본값: `<입력파일명>.ipxact`)
+- `-o, --output`: 출력 IP-XACT 파일 (기본값: `<input>.ipxact`)
 - `--rebuild`: 라이브러리 캐시 강제 재생성
 - `--libs`: 라이브러리 디렉토리 경로 (기본값: `libs`)
 - `--cache`: 캐시 파일 경로 (기본값: `.libs_cache.json`)
 - `--threshold`: 매칭 임계값 0.0-1.0 (기본값: 0.6)
+- `--ipxact-2009`: IP-XACT 2009 표준 사용 (기본값: 2014)
+- `--validate`: 생성된 IP-XACT 파일 유효성 검사
 - `-v, --verbose`: 상세 출력
 
 ## 예제

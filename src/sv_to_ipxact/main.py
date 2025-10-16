@@ -23,6 +23,7 @@ Examples:
   %(prog)s -i design.sv --rebuild
   %(prog)s -i design.sv --ipxact-2009
   %(prog)s -i design.sv --validate
+  %(prog)s -i design.sv -v
         """
     )
 

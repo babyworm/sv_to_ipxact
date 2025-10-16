@@ -36,6 +36,12 @@ sv_to_ipxact -i design.sv -o output.xml
 # Rebuild library cache
 sv_to_ipxact -i design.sv --rebuild
 
+# Use IP-XACT 2009 standard
+sv_to_ipxact -i design.sv --ipxact-2009
+
+# Validate the generated IP-XACT file
+sv_to_ipxact -i design.sv --validate
+
 # Verbose output
 sv_to_ipxact -i design.sv -v
 ```
@@ -43,11 +49,13 @@ sv_to_ipxact -i design.sv -v
 ### Options
 
 - `-i, --input`: Input SystemVerilog file (required)
-- `-o, --output`: Output IP-XACT file (default: `<input_filename>.ipxact`)
+- `-o, --output`: Output IP-XACT file (default: `<input>.ipxact`)
 - `--rebuild`: Force rebuild of the library cache
 - `--libs`: Library directory path (default: `libs`)
 - `--cache`: Cache file path (default: `.libs_cache.json`)
 - `--threshold`: Matching threshold 0.0-1.0 (default: 0.6)
+- `--ipxact-2009`: Use IP-XACT 2009 standard (default: 2014)
+- `--validate`: Validate the generated IP-XACT file
 - `-v, --verbose`: Verbose output
 
 ## Examples

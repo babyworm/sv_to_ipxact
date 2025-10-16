@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:abstractionDefinition
+    xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd">
+
+    <!-- VLNV of this abstraction definition -->
+    <spirit:vendor>ddr-phy.org</spirit:vendor>
+    <spirit:library>DFI</spirit:library>
+    <spirit:name>DFI_rtl</spirit:name>
+    <spirit:version>1.0</spirit:version>
+
+    <!-- Tie to the DFI busDefinition above -->
+    <spirit:busType vendor="ddr-phy.org" library="DFI" name="DFI" version="1.0"/>
+
+    <spirit:ports>
+
+        <!-- ===== Clocks & Reset ===== -->
+        <!-- DFI interface clock: symmetric 'in' on both master/slave (툴 관례상 클록/리셋은 둘 다 입력) -->
+        <spirit:port>
+            <spirit:logicalName>dfi_clk</spirit:logicalName>
+            <spirit:wire>
+                <spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+
+        <!-- DRAM reset_n driven by controller toward PHY -->
+        <spirit:port>
+            <spirit:logicalName>dfi_reset_n</spirit:logicalName>
+            <spirit:wire>
+                <spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave>
+            </spirit:wire>
+        </spirit:port>
+
+        <!-- ===== Command / Address (Controller -> PHY) ===== -->
+        <spirit:port><spirit:logicalName>dfi_address</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_bank</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_cs_n</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_cke</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_odt</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_ras_n</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_cas_n</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_we_n</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <!-- ===== Write path (Controller -> PHY) ===== -->
+        <spirit:port><spirit:logicalName>dfi_wrdata_en</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_wrdata</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_wrdata_mask</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <!-- ===== Read path (PHY -> Controller) ===== -->
+        <spirit:port><spirit:logicalName>dfi_rddata_en</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_rddata</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_rddata_valid</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <!-- ===== Update / Status Handshakes ===== -->
+        <spirit:port><spirit:logicalName>dfi_ctrlupd_req</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_ctrlupd_ack</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_phyupd_req</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_phyupd_ack</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <!-- ===== Initialization / Training ===== -->
+        <spirit:port><spirit:logicalName>dfi_init_start</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>out</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>in</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_init_complete</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+        <spirit:port><spirit:logicalName>dfi_training_complete</spirit:logicalName>
+            <spirit:wire><spirit:onMaster><spirit:direction>in</spirit:direction></spirit:onMaster>
+                        <spirit:onSlave><spirit:direction>out</spirit:direction></spirit:onSlave></spirit:wire></spirit:port>
+
+    </spirit:ports>
+</spirit:abstractionDefinition>
+
