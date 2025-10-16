@@ -40,11 +40,6 @@ class ProtocolDefinition:
 class LibraryParser:
     """Parser for IP-XACT library XML files."""
 
-    NAMESPACES = {
-        'spirit': 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009',
-        'arm': 'http://www.arm.com/SPIRIT/1685-2009'
-    }
-
     def __init__(self, libs_dir: str = "libs"):
         self.libs_dir = Path(libs_dir)
         self.protocols: Dict[str, ProtocolDefinition] = {}
@@ -78,14 +73,30 @@ class LibraryParser:
         """Parse a single protocol definition."""
         tree = etree.parse(str(bus_def_file))
         root = tree.getroot()
+        nsmap = root.nsmap
+
+        # Determine the primary namespace prefix
+        if 'spirit' in nsmap:
+            ns_prefix = 'spirit'
+        elif 'ipxact' in nsmap:
+            ns_prefix = 'ipxact'
+        else:
+            # Fallback for files with no namespace prefix but a default namespace
+            for prefix, uri in nsmap.items():
+                if '1685-2009' in uri or '1685-2014' in uri:
+                    nsmap['temp'] = uri
+                    ns_prefix = 'temp'
+                    break
+            else:
+                return None
 
         # Extract basic information from bus definition
-        vendor = self._get_text(root, './/spirit:vendor')
-        library = self._get_text(root, './/spirit:library')
-        name = self._get_text(root, './/spirit:name')
-        version = self._get_text(root, './/spirit:version')
-        description = self._get_text(root, './/spirit:description', default="")
-        is_addressable = self._get_text(root, './/spirit:isAddressable', default="false") == "true"
+        vendor = self._get_text(root, f'.//{ns_prefix}:vendor', nsmap)
+        library = self._get_text(root, f'.//{ns_prefix}:library', nsmap)
+        name = self._get_text(root, f'.//{ns_prefix}:name', nsmap)
+        version = self._get_text(root, f'.//{ns_prefix}:version', nsmap)
+        description = self._get_text(root, f'.//{ns_prefix}:description', nsmap, default="")
+        is_addressable = self._get_text(root, f'.//{ns_prefix}:isAddressable', nsmap, default="false") == "true"
 
         if not all([vendor, library, name, version]):
             return None
@@ -106,7 +117,7 @@ class LibraryParser:
             )
 
         # Parse RTL abstraction for signal definitions
-        master_signals, slave_signals = self._parse_rtl_definition(rtl_file)
+        master_signals, slave_signals = self._parse_rtl_definition(rtl_file, nsmap, ns_prefix)
 
         return ProtocolDefinition(
             vendor=vendor,
@@ -119,7 +130,7 @@ class LibraryParser:
             slave_signals=slave_signals
         )
 
-    def _parse_rtl_definition(self, rtl_file: Path) -> Tuple[List[SignalDefinition], List[SignalDefinition]]:
+    def _parse_rtl_definition(self, rtl_file: Path, nsmap: dict, ns_prefix: str) -> Tuple[List[SignalDefinition], List[SignalDefinition]]:
         """Parse RTL abstraction definition to extract signal definitions."""
         tree = etree.parse(str(rtl_file))
         root = tree.getroot()
@@ -128,39 +139,39 @@ class LibraryParser:
         slave_signals = []
 
         # Parse all port definitions
-        for port in root.xpath('.//spirit:port', namespaces=self.NAMESPACES):
-            logical_name = self._get_text(port, './/spirit:logicalName')
+        for port in root.xpath(f'.//{ns_prefix}:port', namespaces=nsmap):
+            logical_name = self._get_text(port, f'.//{ns_prefix}:logicalName', nsmap)
             if not logical_name:
                 continue
 
-            description = self._get_text(port, './/spirit:description', default="")
+            description = self._get_text(port, f'.//{ns_prefix}:description', nsmap, default="")
 
             # Check if it's a clock or reset signal
-            is_clock = self._get_text(port, './/spirit:qualifier/spirit:isClock', default="false") == "true"
-            is_reset = self._get_text(port, './/spirit:qualifier/spirit:isReset', default="false") == "true"
+            is_clock = self._get_text(port, f'.//{ns_prefix}:qualifier/{ns_prefix}:isClock', nsmap, default="false") == "true"
+            is_reset = self._get_text(port, f'.//{ns_prefix}:qualifier/{ns_prefix}:isReset', nsmap, default="false") == "true"
 
             # Parse master signals
-            on_master = port.find('.//spirit:onMaster', namespaces=self.NAMESPACES)
+            on_master = port.find(f'.//{ns_prefix}:onMaster', namespaces=nsmap)
             if on_master is not None:
-                signal = self._parse_signal_def(on_master, logical_name, description, is_clock, is_reset)
+                signal = self._parse_signal_def(on_master, logical_name, description, is_clock, is_reset, nsmap, ns_prefix)
                 if signal:
                     master_signals.append(signal)
 
             # Parse slave signals
-            on_slave = port.find('.//spirit:onSlave', namespaces=self.NAMESPACES)
+            on_slave = port.find(f'.//{ns_prefix}:onSlave', namespaces=nsmap)
             if on_slave is not None:
-                signal = self._parse_signal_def(on_slave, logical_name, description, is_clock, is_reset)
+                signal = self._parse_signal_def(on_slave, logical_name, description, is_clock, is_reset, nsmap, ns_prefix)
                 if signal:
                     slave_signals.append(signal)
 
         return master_signals, slave_signals
 
     def _parse_signal_def(self, element, logical_name: str, description: str,
-                         is_clock: bool, is_reset: bool) -> Optional[SignalDefinition]:
+                         is_clock: bool, is_reset: bool, nsmap: dict, ns_prefix: str) -> Optional[SignalDefinition]:
         """Parse a single signal definition from onMaster/onSlave element."""
-        presence = self._get_text(element, './/spirit:presence', default="required")
-        direction = self._get_text(element, './/spirit:direction', default="")
-        width_str = self._get_text(element, './/spirit:width', default="1")
+        presence = self._get_text(element, f'.//{ns_prefix}:presence', nsmap, default="required")
+        direction = self._get_text(element, f'.//{ns_prefix}:direction', nsmap, default="")
+        width_str = self._get_text(element, f'.//{ns_prefix}:width', nsmap, default="1")
 
         try:
             width = int(width_str)
@@ -180,9 +191,9 @@ class LibraryParser:
             is_reset=is_reset
         )
 
-    def _get_text(self, element, xpath: str, default: str = None) -> Optional[str]:
+    def _get_text(self, element, xpath: str, nsmap: dict, default: str = None) -> Optional[str]:
         """Get text content from an XPath query."""
-        result = element.xpath(xpath, namespaces=self.NAMESPACES)
+        result = element.xpath(xpath, namespaces=nsmap)
         if result and len(result) > 0:
             text = result[0].text
             return text.strip() if text else default

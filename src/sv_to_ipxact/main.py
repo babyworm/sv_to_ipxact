@@ -21,6 +21,7 @@ Examples:
   %(prog)s -i design.sv
   %(prog)s -i design.sv -o output.xml
   %(prog)s -i design.sv --rebuild
+  %(prog)s -i design.sv --ipxact-2009
         """
     )
 
@@ -61,6 +62,12 @@ Examples:
     )
 
     parser.add_argument(
+        '--ipxact-2009',
+        action='store_true',
+        help='Use IP-XACT 2009 standard (default: 2014)'
+    )
+
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         help='Verbose output'
@@ -80,11 +87,14 @@ Examples:
     else:
         output_path = input_path.with_suffix('.ipxact')
 
+    ipxact_version = '2009' if args.ipxact_2009 else '2014'
+
     print("=" * 70)
     print("SystemVerilog to IP-XACT Converter")
     print("=" * 70)
     print(f"Input:  {input_path}")
     print(f"Output: {output_path}")
+    print(f"IP-XACT Version: {ipxact_version}")
     print()
 
     # Step 1: Load protocol library
@@ -152,7 +162,7 @@ Examples:
     # Step 4: Generate IP-XACT
     print("[4] Generating IP-XACT...")
     try:
-        generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports)
+        generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version)
         generator.write_to_file(str(output_path))
     except Exception as e:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)
