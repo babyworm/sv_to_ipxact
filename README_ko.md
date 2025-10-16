@@ -39,6 +39,9 @@ sv_to_ipxact -i design.sv --rebuild
 # IP-XACT 2009 표준 사용
 sv_to_ipxact -i design.sv --ipxact-2009
 
+# IP-XACT 2022 표준 사용
+sv_to_ipxact -i design.sv --ipxact-2022
+
 # 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
 sv_to_ipxact -i design.sv --validate
 
@@ -61,6 +64,7 @@ sv_to_ipxact -i design.sv -v
 - `--cache`: 캐시 파일 경로 (기본값: `.libs_cache.json`)
 - `--threshold`: 매칭 임계값 0.0-1.0 (기본값: 0.6)
 - `--ipxact-2009`: IP-XACT 2009 표준 사용 (기본값: 2014)
+- `--ipxact-2022`: IP-XACT 2022 표준 사용 (기본값: 2014)
 - `--validate`: 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
 - `--validate-local`: 생성된 IP-XACT 파일을 로컬 스키마에 대해 유효성 검사 (없으면 다운로드)
 - `--no-validate`: 생성된 IP-XACT 파일 유효성 검사 안 함

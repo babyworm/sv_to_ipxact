@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ipxact:component xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
+<ipxact:component xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
   <ipxact:vendor>user</ipxact:vendor>
   <ipxact:library>user</ipxact:library>
   <ipxact:name>axi_master_example</ipxact:name>
@@ -279,7 +279,7 @@
           </ipxact:portMaps>
         </ipxact:abstractionType>
       </ipxact:abstractionTypes>
-      <ipxact:master/>
+      <ipxact:initiator/>
     </ipxact:busInterface>
   </ipxact:busInterfaces>
   <ipxact:model>

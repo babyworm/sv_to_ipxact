@@ -35,13 +35,24 @@ class IPXACTGenerator:
         'http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd'
     )
 
+    NAMESPACES_2022 = {
+        'ipxact': 'http://www.accellera.org/XMLSchema/IPXACT/1685-2022',
+        'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+    }
+
+    SCHEMA_LOCATION_2022 = (
+        'http://www.accellera.org/XMLSchema/IPXACT/1685-2022 '
+        'http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd'
+    )
+
     XSD_FILES = [
         "abstractionDefinition.xsd", "abstractor.xsd", "autoConfigure.xsd",
         "busDefinition.xsd", "busInterface.xsd", "commonStructures.xsd",
         "component.xsd", "configurable.xsd", "constraints.xsd", "design.xsd",
         "designConfig.xsd", "file.xsd", "fileType.xsd", "generator.xsd",
         "identifier.xsd", "index.xsd", "memoryMap.xsd", "model.xsd", "port.xsd",
-        "signalDrivers.xsd", "simpleTypes.xsd", "subInstances.xsd", "catalog.xsd"
+        "signalDrivers.xsd", "simpleTypes.xsd", "subInstances.xsd", "catalog.xsd",
+        "typeDefinitions.xsd"
     ]
 
     def __init__(self, module: ModuleDefinition, bus_interfaces: List[BusInterface],
@@ -55,6 +66,10 @@ class IPXACTGenerator:
             self.ns_prefix = 'spirit'
             self.namespaces = self.NAMESPACES_2009
             self.schema_location = self.SCHEMA_LOCATION_2009
+        elif self.version == '2022':
+            self.ns_prefix = 'ipxact'
+            self.namespaces = self.NAMESPACES_2022
+            self.schema_location = self.SCHEMA_LOCATION_2022
         else:
             self.ns_prefix = 'ipxact'
             self.namespaces = self.NAMESPACES_2014
@@ -142,6 +157,44 @@ class IPXACTGenerator:
 
                 # Port maps
                 port_maps = etree.SubElement(bus_interface_elem, f"{{{ns}}}portMaps")
+
+                for logical_name, physical_name in sorted(bus_if.port_maps.items()):
+                    port_map = etree.SubElement(port_maps, f"{{{ns}}}portMap")
+
+                    # Logical port
+                    logical_port = etree.SubElement(port_map, f"{{{ns}}}logicalPort")
+                    log_name = etree.SubElement(logical_port, f"{{{ns}}}name")
+                    log_name.text = logical_name
+
+                    # Physical port
+                    physical_port = etree.SubElement(port_map, f"{{{ns}}}physicalPort")
+                    phys_name = etree.SubElement(physical_port, f"{{{ns}}}name")
+                    phys_name.text = physical_name
+            elif self.version == '2022':
+                # Bus type reference
+                bus_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}busType")
+                bus_type.set("vendor", bus_if.protocol.vendor)
+                bus_type.set("library", bus_if.protocol.library)
+                bus_type.set("name", bus_if.protocol.name)
+                bus_type.set("version", bus_if.protocol.version)
+
+                # Abstraction types
+                abstraction_types = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionTypes")
+                abstraction_type = etree.SubElement(abstraction_types, f"{{{ns}}}abstractionType")
+                
+                # Abstraction type reference
+                abstraction_ref = etree.SubElement(abstraction_type, f"{{{ns}}}abstractionRef")
+                abstraction_ref.set("vendor", bus_if.protocol.vendor)
+                abstraction_ref.set("library", bus_if.protocol.library)
+                abstraction_ref.set("name", f"{bus_if.protocol.name}_rtl")
+                abstraction_ref.set("version", bus_if.protocol.version)
+
+                # Interface mode (initiator/target)
+                mode_name = 'initiator' if bus_if.interface_mode == 'master' else 'target'
+                mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
+
+                # Port maps
+                port_maps = etree.SubElement(abstraction_type, f"{{{ns}}}portMaps")
 
                 for logical_name, physical_name in sorted(bus_if.port_maps.items()):
                     port_map = etree.SubElement(port_maps, f"{{{ns}}}portMap")
@@ -265,7 +318,7 @@ class IPXACTGenerator:
                 right = etree.SubElement(vector, f"{{{ns}}}right")
                 right.text = str(port.lsb if port.lsb is not None else 0)
 
-    def write_to_file(self, output_path: str, validation_type: str = 'none'):
+    def write_to_file(self, output_path: str):
         """Write generated IP-XACT to file."""
         root = self.generate()
 
@@ -279,22 +332,21 @@ class IPXACTGenerator:
 
         print(f"IP-XACT file written to: {output_path}")
 
-        if validation_type == 'remote':
-            self._validate_remote_xml(output_path)
-        elif validation_type == 'local':
-            self._validate_local_xml(output_path)
-
-    def _validate_remote_xml(self, xml_path: str):
-        """Validate the generated XML against the schema."""
+    def _validate_remote_xml(self, xml_path: str) -> str:
+        """Validate the generated XML against the remote schema."""
         if self.version == '2009':
             schema_url = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd'
+        elif self.version == '2022':
+            schema_url = 'http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd'
         else:
             schema_url = 'http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd'
 
-        print(f"Validating {xml_path} against {schema_url}...")
+        command = ["xmllint", "--noout", "--schema", schema_url, xml_path]
+        print(f"Validating '{xml_path}' against {schema_url}...")
+        print(f"  Validation command: {" ".join(command)}")
         try:
             result = subprocess.run(
-                ["xmllint", "--noout", "--schema", schema_url, xml_path],
+                command,
                 capture_output=True,
                 text=True,
                 check=True
@@ -305,6 +357,42 @@ class IPXACTGenerator:
         except subprocess.CalledProcessError as e:
             print("Validation failed:")
             print(e.stderr)
+        return " ".join(command)
+
+    def _validate_local_xml(self, xml_path: str) -> str:
+        """Validate the generated XML against a local schema."""
+        schema_dir = Path("schemas") / self.version
+        schema_path = schema_dir / "index.xsd"
+
+        if not schema_path.exists():
+            print(f"Local schema not found for version {self.version}. Downloading...")
+            self._download_schemas(self.version, schema_dir)
+
+        command = ["xmllint", "--noout", "--schema", str(schema_path), xml_path]
+        print(f"Validating '{xml_path}' against local schema {schema_path}...")
+        print(f"  Validation command: {" ".join(command)}")
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print("Validation successful.")
+        except FileNotFoundError:
+            print("Warning: `xmllint` not found. Skipping validation.")
+        except subprocess.CalledProcessError as e:
+            print("Validation failed:")
+            print(e.stderr)
+        return " ".join(command)
+
+    def validate_file(self, output_path: str, validation_type: str) -> str:
+        """Validate the generated IP-XACT file based on the validation type."""
+        if validation_type == 'remote':
+            return self._validate_remote_xml(output_path)
+        elif validation_type == 'local':
+            return self._validate_local_xml(output_path)
+        return ""
 
     def to_string(self) -> str:
         """Get XML as string."""
@@ -316,40 +404,28 @@ class IPXACTGenerator:
             encoding='UTF-8'
         ).decode('utf-8')
 
-    def _validate_local_xml(self, xml_path: str):
-        """Validate the generated XML against a local schema."""
-        schema_dir = Path("schemas") / self.version
-        schema_path = schema_dir / "index.xsd"
-
-        if not schema_path.exists():
-            print(f"Local schema not found for version {self.version}. Downloading...")
-            self._download_schemas(self.version, schema_dir)
-
-        print(f"Validating {xml_path} against local schema {schema_path}...")
-        try:
-            result = subprocess.run(
-                ["xmllint", "--noout", "--schema", str(schema_path), xml_path],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            print("Validation successful.")
-        except FileNotFoundError:
-            print("Warning: `xmllint` not found. Skipping validation.")
-        except subprocess.CalledProcessError as e:
-            print("Validation failed:")
-            print(e.stderr)
-
     def _download_schemas(self, version: str, schema_dir: Path):
         """Download schema files for the specified IP-XACT version."""
         schema_dir.mkdir(parents=True, exist_ok=True)
 
         if version == '2009':
             base_url = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009'
+        elif version == '2022':
+            base_url = 'https://www.accellera.org/XMLSchema/IPXACT/1685-2022'
         else:
             base_url = 'http://www.accellera.org/XMLSchema/IPXACT/1685-2014'
 
-        for filename in self.XSD_FILES:
+        schema_files_to_download = list(self.XSD_FILES)
+
+        if version == '2009':
+            # Remove catalog.xsd and typeDefinitions.xsd for 2009 version
+            schema_files_to_download.remove("catalog.xsd")
+            schema_files_to_download.remove("typeDefinitions.xsd")
+        elif version == '2014':
+            # Remove typeDefinitions.xsd for 2014 version
+            schema_files_to_download.remove("typeDefinitions.xsd")
+
+        for filename in schema_files_to_download:
             url = f"{base_url}/{filename}"
             path = schema_dir / filename
             print(f"Downloading {url} to {path}...")
@@ -362,8 +438,8 @@ class IPXACTGenerator:
                     path.unlink()
                 return
 
-        if version == '2014':
-            # Download xml.xsd for 2014 schema
+        if version == '2014' or version == '2022':
+            # Download xml.xsd for 2014 and 2022 schemas
             url = "https://www.w3.org/2001/xml.xsd"
             path = schema_dir / "xml.xsd"
             print(f"Downloading {url} to {path}...")

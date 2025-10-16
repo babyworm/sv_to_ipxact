@@ -70,6 +70,12 @@ Examples:
     )
 
     parser.add_argument(
+        '--ipxact-2022',
+        action='store_true',
+        help='Use IP-XACT 2022 standard (default: 2014)'
+    )
+
+    parser.add_argument(
         '--validate',
         action='store_true',
         help='Validate the generated IP-XACT file against the remote schema (default)'
@@ -107,7 +113,7 @@ Examples:
     else:
         output_path = input_path.with_suffix('.ipxact')
 
-    ipxact_version = '2009' if args.ipxact_2009 else '2014'
+    ipxact_version = '2009' if args.ipxact_2009 else ('2022' if args.ipxact_2022 else '2014')
 
     print("=" * 70)
     print("SystemVerilog to IP-XACT Converter")
@@ -191,10 +197,19 @@ Examples:
             validation_type = 'none'
 
         generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version)
-        generator.write_to_file(str(output_path), validation_type)
+        generator.write_to_file(str(output_path))
     except Exception as e:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)
         return 1
+
+    # Step 5: Validate IP-XACT
+    if validation_type != 'none':
+        print("[5] Validating IP-XACT...")
+        try:
+            shell_command = generator.validate_file(str(output_path), validation_type)
+        except Exception as e:
+            print(f"Error validating IP-XACT: {e}", file=sys.stderr)
+            return 1
 
     print()
     print("=" * 70)

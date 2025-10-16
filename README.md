@@ -39,6 +39,9 @@ sv_to_ipxact -i design.sv --rebuild
 # Use IP-XACT 2009 standard
 sv_to_ipxact -i design.sv --ipxact-2009
 
+# Use IP-XACT 2022 standard
+sv_to_ipxact -i design.sv --ipxact-2022
+
 # Validate the generated IP-XACT file against the remote schema
 sv_to_ipxact -i design.sv --validate
 
@@ -61,6 +64,7 @@ sv_to_ipxact -i design.sv -v
 - `--cache`: Cache file path (default: `.libs_cache.json`)
 - `--threshold`: Matching threshold 0.0-1.0 (default: 0.6)
 - `--ipxact-2009`: Use IP-XACT 2009 standard (default: 2014)
+- `--ipxact-2022`: Use IP-XACT 2022 standard (default: 2014)
 - `--validate`: Validate the generated IP-XACT file against the remote schema
 - `--validate-local`: Validate the generated IP-XACT file against a local schema (downloads if not present)
 - `--no-validate`: Do not validate the generated IP-XACT file
