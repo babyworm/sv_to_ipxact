@@ -11,6 +11,9 @@ ENV/
 dist/
 build/
 
+# secure
+customer/
+
 # Cache
 .libs_cache.json
 

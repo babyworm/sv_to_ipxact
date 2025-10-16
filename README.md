@@ -1,58 +1,58 @@
 # sv_to_ipxact
 
-SystemVerilog 모듈을 IP-XACT 컴포넌트 정의로 변환하는 도구입니다. AMBA 버스 프로토콜을 자동으로 인식하고 busInterface와 portMap을 생성합니다.
+A tool to convert SystemVerilog modules into IP-XACT component definitions. It automatically recognizes AMBA bus protocols and generates busInterfaces and portMaps.
 
-## 주요 기능
+## Key Features
 
-- SystemVerilog 모듈 파서 (ANSI 및 non-ANSI 스타일 지원)
-- 89개의 AMBA 프로토콜 정의 라이브러리 (AMBA2~5)
-- 자동 버스 인터페이스 매칭 (신호 prefix 기반)
-- 동적 라이브러리 로딩 및 캐싱
-- IP-XACT (IEEE 1685-2009) XML 생성
+- SystemVerilog module parser (supports ANSI and non-ANSI styles)
+- Library of 89 AMBA protocol definitions (AMBA2~5)
+- Automatic bus interface matching (based on signal prefixes)
+- Dynamic library loading and caching
+- IP-XACT (IEEE 1685-2009) XML generation
 
-## 설치
+## Installation
 
 ```bash
-# Python 가상환경 생성
+# Create a Python virtual environment
 python3 -m venv venv
 source venv/bin/activate  # Linux/Mac
-# 또는: venv\Scripts\activate  # Windows
+# Or: venv\Scripts\activate  # Windows
 
-# 패키지 설치
+# Install the package
 pip install -e .
 ```
 
-## 사용법
+## Usage
 
-### 기본 사용
+### Basic Usage
 
 ```bash
-# 입력 파일만 지정 (출력: design.ipxact)
+# Specify only input file (output: design.ipxact)
 sv_to_ipxact -i design.sv
 
-# 출력 파일 지정
+# Specify output file
 sv_to_ipxact -i design.sv -o output.xml
 
-# 라이브러리 캐시 재생성
+# Rebuild library cache
 sv_to_ipxact -i design.sv --rebuild
 
-# 상세 출력
+# Verbose output
 sv_to_ipxact -i design.sv -v
 ```
 
-### 옵션
+### Options
 
-- `-i, --input`: 입력 SystemVerilog 파일 (필수)
-- `-o, --output`: 출력 IP-XACT 파일 (기본값: `<입력파일명>.ipxact`)
-- `--rebuild`: 라이브러리 캐시 강제 재생성
-- `--libs`: 라이브러리 디렉토리 경로 (기본값: `libs`)
-- `--cache`: 캐시 파일 경로 (기본값: `.libs_cache.json`)
-- `--threshold`: 매칭 임계값 0.0-1.0 (기본값: 0.6)
-- `-v, --verbose`: 상세 출력
+- `-i, --input`: Input SystemVerilog file (required)
+- `-o, --output`: Output IP-XACT file (default: `<input_filename>.ipxact`)
+- `--rebuild`: Force rebuild of the library cache
+- `--libs`: Library directory path (default: `libs`)
+- `--cache`: Cache file path (default: `.libs_cache.json`)
+- `--threshold`: Matching threshold 0.0-1.0 (default: 0.6)
+- `-v, --verbose`: Verbose output
 
-## 예제
+## Examples
 
-### AXI4 Master 인터페이스
+### AXI4 Master Interface
 
 ```systemverilog
 module axi_master_example (
@@ -62,18 +62,18 @@ module axi_master_example (
     // AXI4 Master
     output wire [31:0] M_AXI_AWADDR,
     output wire [7:0]  M_AXI_AWLEN,
-    // ... 기타 AXI4 신호들
+    // ... other AXI4 signals
 );
 ```
 
-변환:
+Conversion:
 ```bash
 sv_to_ipxact -i examples/axi_master_example.sv
 ```
 
-결과: `M_AXI` 프리픽스를 가진 신호들이 AXI4 master busInterface로 매핑됨
+Result: Signals with the `M_AXI` prefix are mapped to the AXI4 master busInterface.
 
-### 다중 인터페이스
+### Multiple Interfaces
 
 ```systemverilog
 module dual_interface (
@@ -87,9 +87,9 @@ module dual_interface (
 );
 ```
 
-두 개의 버스 인터페이스가 자동으로 인식되어 각각 매핑됩니다.
+Two bus interfaces are automatically recognized and mapped respectively.
 
-## 지원 프로토콜
+## Supported Protocols
 
 ### AMBA2
 - AHB
@@ -113,171 +113,171 @@ module dual_interface (
 - APB5
 - AHB5Initiator, AHB5Target
 - ACE5, ACE5-Lite, ACE5-LiteACP, ACE5-LiteDVM
-- CHI (A~H 버전, RND/RNF/RNI/SNF/SNI)
+- CHI (Versions A~H, RND/RNF/RNI/SNF/SNI)
 - ATB, CXS, GFB, LTI
 
-## 프로젝트 구조
+## Project Structure
 
 ```
 sv_to_ipxact/
 ├── src/sv_to_ipxact/
-│   ├── library_parser.py     # AMBA 프로토콜 XML 파서
-│   ├── sv_parser.py           # SystemVerilog 파서
-│   ├── protocol_matcher.py   # 프로토콜 매칭 알고리즘
-│   ├── ipxact_generator.py   # IP-XACT XML 생성기
-│   └── main.py                # CLI 엔트리포인트
-├── libs/                      # AMBA 프로토콜 정의 (ARM 제공)
-├── examples/                  # 예제 파일
-├── CLAUDE.md                  # 개발자 가이드
+│   ├── library_parser.py     # AMBA protocol XML parser
+│   ├── sv_parser.py           # SystemVerilog parser
+│   ├── protocol_matcher.py   # Protocol matching algorithm
+│   ├── ipxact_generator.py   # IP-XACT XML generator
+│   └── main.py                # CLI entry point
+├── libs/                      # AMBA protocol definitions (provided by ARM)
+├── examples/                  # Example files
+├── CLAUDE.md                  # Developer Guide
 └── README.md
 ```
 
-## 동작 방식
+## How It Works
 
-1. **라이브러리 로딩**: `libs/` 디렉토리의 IP-XACT 프로토콜 정의 파싱 (첫 실행 시 캐싱)
-2. **SystemVerilog 파싱**: 모듈 포트 추출
-3. **신호 그룹화**: 공통 prefix를 가진 신호들을 그룹화
-4. **프로토콜 매칭**: 각 그룹을 AMBA 프로토콜과 비교하여 최적 매치 선택
-5. **IP-XACT 생성**: busInterface와 portMap을 포함한 XML 생성
+1.  **Library Loading**: Parses IP-XACT protocol definitions in the `libs/` directory (cached on first run).
+2.  **SystemVerilog Parsing**: Extracts module ports.
+3.  **Signal Grouping**: Groups signals with a common prefix.
+4.  **Protocol Matching**: Compares each group against AMBA protocols to find the best match.
+5.  **IP-XACT Generation**: Creates the XML file including busInterfaces and portMaps.
 
-## 라이브러리 업데이트
+## Library Updates
 
-`libs/` 디렉토리에 새로운 프로토콜 정의를 추가하면 자동으로 인식됩니다:
+New protocol definitions added to the `libs/` directory are automatically recognized:
 
 ```bash
-# 새 프로토콜 추가 후
+# After adding a new protocol
 sv_to_ipxact -i design.sv --rebuild
 ```
 
-라이브러리 캐시는 자동으로 무효화되며, `--rebuild` 옵션으로 수동 재생성 가능합니다.
+The library cache is automatically invalidated, and can be manually rebuilt with the `--rebuild` option.
 
-## 문서
+## Documentation
 
-### 온라인 문서 생성
+### Generating Online Documentation
 
-프로젝트의 전체 API 문서와 상세 가이드를 생성할 수 있습니다:
+You can generate the full API documentation and detailed guides for the project:
 
 ```bash
-# 문서 생성 의존성 설치
+# Install documentation dependencies
 pip install -r docs_requirements.txt
 
-# 문서 생성
+# Generate documentation
 ./generate_docs.sh
 
-# 또는
+# Or
 cd docs && make html
 ```
 
-생성된 문서는 `docs/_build/html/index.html` 에서 확인할 수 있습니다.
+The generated documentation can be found at `docs/_build/html/index.html`.
 
-### 문서 내용
+### Documentation Contents
 
-- **설치 가이드**: 설치 방법 및 의존성
-- **사용 가이드**: 명령행 옵션 및 워크플로우
-- **API 문서**: 전체 Python API 레퍼런스
-- **예제 모음**: 다양한 사용 예제와 설명
-- **개발자 가이드**: [CLAUDE.md](CLAUDE.md) - 내부 아키텍처 및 개발 지침
+- **Installation Guide**: Installation methods and dependencies.
+- **Usage Guide**: Command-line options and workflow.
+- **API Documentation**: Full Python API reference.
+- **Examples**: A collection of various usage examples and explanations.
+- **Developer Guide**: [CLAUDE.md](CLAUDE.md) - Internal architecture and development guidelines.
 
-### 소스코드 문서화
+### Source Code Documentation
 
-모든 Python 모듈은 상세한 docstring을 포함하고 있습니다:
+All Python modules include detailed docstrings:
 
-- Google 스타일 docstring
-- 타입 힌트 포함
-- 사용 예제 포함
-- Sphinx를 통한 자동 문서 생성
+- Google-style docstrings
+- Type hints included
+- Usage examples included
+- Automatic documentation generation via Sphinx
 
-예시:
+Example:
 ```python
 from sv_to_ipxact.sv_parser import SystemVerilogParser
 
-# 도움말 보기
+# View help
 help(SystemVerilogParser)
 help(SystemVerilogParser.parse_file)
 ```
 
-## 테스트
+## Testing
 
-### 유닛 테스트 실행
+### Running Unit Tests
 
 ```bash
-# 유닛 테스트만 실행
+# Run unit tests only
 make test-unit
 
-# 통합 테스트 실행
+# Run integration tests
 make test-integration
 
-# 모든 테스트 실행
+# Run all tests
 make test-all
 
-# 커버리지 포함 테스트
+# Run tests with coverage
 make test-cov
 ```
 
-### 테스트 커버리지
+### Test Coverage
 
-현재 테스트 커버리지:
+Current test coverage:
 - **library_parser.py**: 93%
 - **protocol_matcher.py**: 84%
 - **sv_parser.py**: 87%
-- **ipxact_generator.py**: 92% (통합 테스트)
+- **ipxact_generator.py**: 92% (integration test)
 
-커버리지 리포트는 `htmlcov/index.html` 에서 확인할 수 있습니다.
+The coverage report can be viewed at `htmlcov/index.html`.
 
-## Makefile 명령어
+## Makefile Commands
 
-프로젝트는 다양한 작업을 쉽게 수행할 수 있는 Makefile을 제공합니다:
+The project provides a Makefile to easily perform various tasks:
 
 ```bash
-# 도움말 보기
+# Show help
 make help
 
-# 개발 환경 설정
+# Set up development environment
 make install-dev
 
-# 테스트
-make test           # 유닛 테스트
-make test-all       # 모든 테스트
-make test-cov       # 커버리지 포함
+# Tests
+make test           # Unit tests
+make test-all       # All tests
+make test-cov       # With coverage
 
-# 코드 품질
-make lint           # 린터 실행
-make format         # 코드 포맷팅
-make check          # 린트 + 테스트
+# Code Quality
+make lint           # Run linter
+make format         # Format code
+make check          # Lint + Test
 
-# 문서
-make docs           # 문서 생성
-make docs-serve     # 문서 생성 후 브라우저에서 열기
+# Documentation
+make docs           # Generate docs
+make docs-serve     # Generate docs and open in browser
 
-# 예제
-make run-examples   # 모든 예제 실행
-make rebuild-cache  # 라이브러리 캐시 재생성
+# Examples
+make run-examples   # Run all examples
+make rebuild-cache  # Rebuild library cache
 
-# 정리
-make clean          # 빌드 산출물 제거
-make clean-all      # 모든 생성 파일 제거
+# Clean
+make clean          # Remove build artifacts
+make clean-all      # Remove all generated files
 
 # CI
-make ci             # 전체 CI 파이프라인
-make ci-quick       # 빠른 CI 체크
+make ci             # Full CI pipeline
+make ci-quick       # Quick CI check
 ```
 
-### 자주 사용하는 명령어
+### Frequently Used Commands
 
 ```bash
-# 개발 시작
+# Start development
 make install-dev
 
-# 코드 변경 후 테스트
+# Test after code changes
 make test
 
-# 커밋 전 체크
+# Check before commit
 make check
 
-# 예제 실행
+# Run examples
 make run-examples
 ```
 
-## 개발자 가이드
+## Developer Guide
 
-상세한 개발 가이드는 [CLAUDE.md](CLAUDE.md)를 참조하세요.
+For a detailed developer guide, please refer to [CLAUDE.md](CLAUDE.md).
