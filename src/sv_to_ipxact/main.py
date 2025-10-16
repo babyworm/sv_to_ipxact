@@ -22,6 +22,7 @@ Examples:
   %(prog)s -i design.sv -o output.xml
   %(prog)s -i design.sv --rebuild
   %(prog)s -i design.sv --ipxact-2009
+  %(prog)s -i design.sv --validate
         """
     )
 
@@ -65,6 +66,12 @@ Examples:
         '--ipxact-2009',
         action='store_true',
         help='Use IP-XACT 2009 standard (default: 2014)'
+    )
+
+    parser.add_argument(
+        '--validate',
+        action='store_true',
+        help='Validate the generated IP-XACT file'
     )
 
     parser.add_argument(
@@ -163,7 +170,7 @@ Examples:
     print("[4] Generating IP-XACT...")
     try:
         generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version)
-        generator.write_to_file(str(output_path))
+        generator.write_to_file(str(output_path), args.validate)
     except Exception as e:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)
         return 1

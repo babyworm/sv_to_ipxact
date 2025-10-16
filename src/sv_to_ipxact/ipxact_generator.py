@@ -1,5 +1,7 @@
 """IP-XACT XML generator."""
 
+import os
+import subprocess
 from typing import List
 from lxml import etree
 from datetime import datetime
@@ -108,39 +110,78 @@ class IPXACTGenerator:
             name = etree.SubElement(bus_interface_elem, f"{{{ns}}}name")
             name.text = bus_if.name
 
-            # Bus type reference
-            bus_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}busType")
-            bus_type.set("vendor", bus_if.protocol.vendor)
-            bus_type.set("library", bus_if.protocol.library)
-            bus_type.set("name", bus_if.protocol.name)
-            bus_type.set("version", bus_if.protocol.version)
+            if self.version == '2009':
+                # Bus type reference
+                bus_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}busType")
+                bus_type.set(f"{{{ns}}}vendor", bus_if.protocol.vendor)
+                bus_type.set(f"{{{ns}}}library", bus_if.protocol.library)
+                bus_type.set(f"{{{ns}}}name", bus_if.protocol.name)
+                bus_type.set(f"{{{ns}}}version", bus_if.protocol.version)
 
-            # Abstraction type reference
-            abstraction_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionType")
-            abstraction_type.set("vendor", bus_if.protocol.vendor)
-            abstraction_type.set("library", bus_if.protocol.library)
-            abstraction_type.set("name", f"{bus_if.protocol.name}_rtl")
-            abstraction_type.set("version", bus_if.protocol.version)
+                # Abstraction type reference
+                abstraction_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionType")
+                abstraction_type.set(f"{{{ns}}}vendor", bus_if.protocol.vendor)
+                abstraction_type.set(f"{{{ns}}}library", bus_if.protocol.library)
+                abstraction_type.set(f"{{{ns}}}name", f"{bus_if.protocol.name}_rtl")
+                abstraction_type.set(f"{{{ns}}}version", bus_if.protocol.version)
 
-            # Interface mode (master/slave)
-            mode_name = 'master' if bus_if.interface_mode == 'master' else 'slave'
-            mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
+                # Interface mode (master/slave)
+                mode_name = 'master' if bus_if.interface_mode == 'master' else 'slave'
+                mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
 
-            # Port maps
-            port_maps = etree.SubElement(bus_interface_elem, f"{{{ns}}}portMaps")
+                # Port maps
+                port_maps = etree.SubElement(bus_interface_elem, f"{{{ns}}}portMaps")
 
-            for logical_name, physical_name in sorted(bus_if.port_maps.items()):
-                port_map = etree.SubElement(port_maps, f"{{{ns}}}portMap")
+                for logical_name, physical_name in sorted(bus_if.port_maps.items()):
+                    port_map = etree.SubElement(port_maps, f"{{{ns}}}portMap")
 
-                # Logical port
-                logical_port = etree.SubElement(port_map, f"{{{ns}}}logicalPort")
-                log_name = etree.SubElement(logical_port, f"{{{ns}}}name")
-                log_name.text = logical_name
+                    # Logical port
+                    logical_port = etree.SubElement(port_map, f"{{{ns}}}logicalPort")
+                    log_name = etree.SubElement(logical_port, f"{{{ns}}}name")
+                    log_name.text = logical_name
 
-                # Physical port
-                physical_port = etree.SubElement(port_map, f"{{{ns}}}physicalPort")
-                phys_name = etree.SubElement(physical_port, f"{{{ns}}}name")
-                phys_name.text = physical_name
+                    # Physical port
+                    physical_port = etree.SubElement(port_map, f"{{{ns}}}physicalPort")
+                    phys_name = etree.SubElement(physical_port, f"{{{ns}}}name")
+                    phys_name.text = physical_name
+            else:
+                # Bus type reference
+                bus_type = etree.SubElement(bus_interface_elem, f"{{{ns}}}busType")
+                bus_type.set("vendor", bus_if.protocol.vendor)
+                bus_type.set("library", bus_if.protocol.library)
+                bus_type.set("name", bus_if.protocol.name)
+                bus_type.set("version", bus_if.protocol.version)
+
+                # Abstraction types
+                abstraction_types = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionTypes")
+                abstraction_type = etree.SubElement(abstraction_types, f"{{{ns}}}abstractionType")
+                
+                # Abstraction type reference
+                abstraction_ref = etree.SubElement(abstraction_type, f"{{{ns}}}abstractionRef")
+                abstraction_ref.set("vendor", bus_if.protocol.vendor)
+                abstraction_ref.set("library", bus_if.protocol.library)
+                abstraction_ref.set("name", f"{bus_if.protocol.name}_rtl")
+                abstraction_ref.set("version", bus_if.protocol.version)
+
+                # Interface mode (master/slave)
+                mode_name = 'master' if bus_if.interface_mode == 'master' else 'slave'
+                mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
+
+                # Port maps
+                port_maps = etree.SubElement(abstraction_type, f"{{{ns}}}portMaps")
+
+                for logical_name, physical_name in sorted(bus_if.port_maps.items()):
+                    port_map = etree.SubElement(port_maps, f"{{{ns}}}portMap")
+
+                    # Logical port
+                    logical_port = etree.SubElement(port_map, f"{{{ns}}}logicalPort")
+                    log_name = etree.SubElement(logical_port, f"{{{ns}}}name")
+                    log_name.text = logical_name
+
+                    # Physical port
+                    physical_port = etree.SubElement(port_map, f"{{{ns}}}physicalPort")
+                    phys_name = etree.SubElement(physical_port, f"{{{ns}}}name")
+                    phys_name.text = physical_name
 
     def _add_model(self, parent: etree.Element):
         """Add model section with ports."""
@@ -154,24 +195,22 @@ class IPXACTGenerator:
         view_name = etree.SubElement(view, f"{{{ns}}}name")
         view_name.text = "rtl"
 
-        env_identifier = etree.SubElement(view, f"{{{ns}}}envIdentifier")
-        env_identifier.text = "verilog"
+        if self.version == '2009':
+            env_identifier = etree.SubElement(view, f"{{{ns}}}envIdentifier")
+            env_identifier.text = "verilog:*:*"
+            language = etree.SubElement(view, f"{{{ns}}}language")
+            language.text = "systemVerilog"
+        else:
+            env_identifier = etree.SubElement(view, f"{{{ns}}}envIdentifier")
+            env_identifier.text = ":verilogSource:systemVerilog"
 
-        language = etree.SubElement(view, f"{{{ns}}}language")
-        language.text = "systemVerilog"
 
         # Add ports section
         ports = etree.SubElement(model, f"{{{ns}}}ports")
 
-        # Get all ports that are not in bus interfaces
-        mapped_ports = set()
-        for bus_if in self.bus_interfaces:
-            mapped_ports.update(bus_if.port_maps.values())
-
-        # Add unmapped ports
+        # Add all ports
         for port in self.module.ports:
-            if port.name not in mapped_ports:
-                self._add_port(ports, port)
+            self._add_port(ports, port)
 
     def _add_port(self, parent: etree.Element, port: PortDefinition):
         """Add a single port definition."""
@@ -197,15 +236,25 @@ class IPXACTGenerator:
 
         # Vector (if width > 1)
         if port.width > 1:
-            vector = etree.SubElement(wire, f"{{{ns}}}vector")
+            if self.version == '2009':
+                vector = etree.SubElement(wire, f"{{{ns}}}vector")
 
-            left = etree.SubElement(vector, f"{{{ns}}}left")
-            left.text = str(port.msb if port.msb is not None else port.width - 1)
+                left = etree.SubElement(vector, f"{{{ns}}}left")
+                left.text = str(port.msb if port.msb is not None else port.width - 1)
 
-            right = etree.SubElement(vector, f"{{{ns}}}right")
-            right.text = str(port.lsb if port.lsb is not None else 0)
+                right = etree.SubElement(vector, f"{{{ns}}}right")
+                right.text = str(port.lsb if port.lsb is not None else 0)
+            else:
+                vectors = etree.SubElement(wire, f"{{{ns}}}vectors")
+                vector = etree.SubElement(vectors, f"{{{ns}}}vector")
 
-    def write_to_file(self, output_path: str):
+                left = etree.SubElement(vector, f"{{{ns}}}left")
+                left.text = str(port.msb if port.msb is not None else port.width - 1)
+
+                right = etree.SubElement(vector, f"{{{ns}}}right")
+                right.text = str(port.lsb if port.lsb is not None else 0)
+
+    def write_to_file(self, output_path: str, validate: bool = False):
         """Write generated IP-XACT to file."""
         root = self.generate()
 
@@ -218,6 +267,31 @@ class IPXACTGenerator:
         )
 
         print(f"IP-XACT file written to: {output_path}")
+
+        if validate:
+            self._validate_xml(output_path)
+
+    def _validate_xml(self, xml_path: str):
+        """Validate the generated XML against the schema."""
+        if self.version == '2009':
+            schema_url = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd'
+        else:
+            schema_url = 'http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd'
+
+        print(f"Validating {xml_path} against {schema_url}...")
+        try:
+            result = subprocess.run(
+                ["xmllint", "--noout", "--schema", schema_url, xml_path],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print("Validation successful.")
+        except FileNotFoundError:
+            print("Warning: `xmllint` not found. Skipping validation.")
+        except subprocess.CalledProcessError as e:
+            print("Validation failed:")
+            print(e.stderr)
 
     def to_string(self) -> str:
         """Get XML as string."""
