@@ -39,8 +39,14 @@ sv_to_ipxact -i design.sv --rebuild
 # IP-XACT 2009 표준 사용
 sv_to_ipxact -i design.sv --ipxact-2009
 
-# 생성된 IP-XACT 파일 유효성 검사
+# 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
 sv_to_ipxact -i design.sv --validate
+
+# 생성된 IP-XACT 파일을 로컬 스키마에 대해 유효성 검사 (없으면 다운로드)
+sv_to_ipxact -i design.sv --validate-local
+
+# 생성된 IP-XACT 파일 유효성 검사 안 함
+sv_to_ipxact -i design.sv --no-validate
 
 # 상세 출력
 sv_to_ipxact -i design.sv -v
@@ -55,7 +61,9 @@ sv_to_ipxact -i design.sv -v
 - `--cache`: 캐시 파일 경로 (기본값: `.libs_cache.json`)
 - `--threshold`: 매칭 임계값 0.0-1.0 (기본값: 0.6)
 - `--ipxact-2009`: IP-XACT 2009 표준 사용 (기본값: 2014)
-- `--validate`: 생성된 IP-XACT 파일 유효성 검사
+- `--validate`: 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
+- `--validate-local`: 생성된 IP-XACT 파일을 로컬 스키마에 대해 유효성 검사 (없으면 다운로드)
+- `--no-validate`: 생성된 IP-XACT 파일 유효성 검사 안 함
 - `-v, --verbose`: 상세 출력
 
 ## 예제
@@ -142,11 +150,12 @@ sv_to_ipxact/
 
 ## 동작 방식
 
-1. **라이브러리 로딩**: `libs/` 디렉토리의 IP-XACT 프로토콜 정의 파싱 (첫 실행 시 캐싱)
-2. **SystemVerilog 파싱**: 모듈 포트 추출
-3. **신호 그룹화**: 공통 prefix를 가진 신호들을 그룹화
-4. **프로토콜 매칭**: 각 그룹을 AMBA 프로토콜과 비교하여 최적 매치 선택
-5. **IP-XACT 생성**: busInterface와 portMap을 포함한 XML 생성
+1.  **라이브러리 로딩**: `libs/` 디렉토리의 IP-XACT 프로토콜 정의 파싱 (첫 실행 시 캐싱)
+2.  **SystemVerilog 파싱**: 모듈 포트 추출
+3.  **신호 그룹화**: 공통 prefix를 가진 신호들을 그룹화
+4.  **프로토콜 매칭**: 각 그룹을 AMBA 프로토콜과 비교하여 최적 매치 선택
+5.  **IP-XACT 생성**: busInterface와 portMap을 포함한 XML 생성
+6.  **로컬 스키마 다운로드 (--validate-local 옵션 사용 시)**: `schemas/IPXACT-<version>/`에 로컬 스키마 파일이 없으면 Accellera 공식 웹사이트에서 자동으로 다운로드됩니다.
 
 ## 라이브러리 업데이트
 
@@ -262,7 +271,7 @@ make run-examples   # 모든 예제 실행
 make rebuild-cache  # 라이브러리 캐시 재생성
 
 # 정리
-make clean          # 빌드 산출물 제거
+clean:          # 빌드 산출물, 캐시 파일 및 다운로드된 스키마 제거
 make clean-all      # 모든 생성 파일 제거
 
 # CI

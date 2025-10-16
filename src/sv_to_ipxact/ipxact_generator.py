@@ -5,6 +5,8 @@ import subprocess
 from typing import List
 from lxml import etree
 from datetime import datetime
+import urllib.request
+from pathlib import Path
 
 from .sv_parser import ModuleDefinition, PortDefinition
 from .protocol_matcher import BusInterface
@@ -32,6 +34,15 @@ class IPXACTGenerator:
         'http://www.accellera.org/XMLSchema/IPXACT/1685-2014 '
         'http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd'
     )
+
+    XSD_FILES = [
+        "abstractionDefinition.xsd", "abstractor.xsd", "autoConfigure.xsd",
+        "busDefinition.xsd", "busInterface.xsd", "commonStructures.xsd",
+        "component.xsd", "configurable.xsd", "constraints.xsd", "design.xsd",
+        "designConfig.xsd", "file.xsd", "fileType.xsd", "generator.xsd",
+        "identifier.xsd", "index.xsd", "memoryMap.xsd", "model.xsd", "port.xsd",
+        "signalDrivers.xsd", "simpleTypes.xsd", "subInstances.xsd", "catalog.xsd"
+    ]
 
     def __init__(self, module: ModuleDefinition, bus_interfaces: List[BusInterface],
                  unmatched_ports: List[PortDefinition], version: str = '2014'):
@@ -254,7 +265,7 @@ class IPXACTGenerator:
                 right = etree.SubElement(vector, f"{{{ns}}}right")
                 right.text = str(port.lsb if port.lsb is not None else 0)
 
-    def write_to_file(self, output_path: str, validate: bool = False):
+    def write_to_file(self, output_path: str, validation_type: str = 'none'):
         """Write generated IP-XACT to file."""
         root = self.generate()
 
@@ -268,10 +279,12 @@ class IPXACTGenerator:
 
         print(f"IP-XACT file written to: {output_path}")
 
-        if validate:
-            self._validate_xml(output_path)
+        if validation_type == 'remote':
+            self._validate_remote_xml(output_path)
+        elif validation_type == 'local':
+            self._validate_local_xml(output_path)
 
-    def _validate_xml(self, xml_path: str):
+    def _validate_remote_xml(self, xml_path: str):
         """Validate the generated XML against the schema."""
         if self.version == '2009':
             schema_url = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd'
@@ -302,3 +315,64 @@ class IPXACTGenerator:
             xml_declaration=True,
             encoding='UTF-8'
         ).decode('utf-8')
+
+    def _validate_local_xml(self, xml_path: str):
+        """Validate the generated XML against a local schema."""
+        schema_dir = Path("schemas") / self.version
+        schema_path = schema_dir / "index.xsd"
+
+        if not schema_path.exists():
+            print(f"Local schema not found for version {self.version}. Downloading...")
+            self._download_schemas(self.version, schema_dir)
+
+        print(f"Validating {xml_path} against local schema {schema_path}...")
+        try:
+            result = subprocess.run(
+                ["xmllint", "--noout", "--schema", str(schema_path), xml_path],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print("Validation successful.")
+        except FileNotFoundError:
+            print("Warning: `xmllint` not found. Skipping validation.")
+        except subprocess.CalledProcessError as e:
+            print("Validation failed:")
+            print(e.stderr)
+
+    def _download_schemas(self, version: str, schema_dir: Path):
+        """Download schema files for the specified IP-XACT version."""
+        schema_dir.mkdir(parents=True, exist_ok=True)
+
+        if version == '2009':
+            base_url = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009'
+        else:
+            base_url = 'http://www.accellera.org/XMLSchema/IPXACT/1685-2014'
+
+        for filename in self.XSD_FILES:
+            url = f"{base_url}/{filename}"
+            path = schema_dir / filename
+            print(f"Downloading {url} to {path}...")
+            try:
+                urllib.request.urlretrieve(url, path)
+            except Exception as e:
+                print(f"Error downloading {filename}: {e}")
+                # Clean up partially downloaded files
+                if path.exists():
+                    path.unlink()
+                return
+
+        if version == '2014':
+            # Download xml.xsd for 2014 schema
+            url = "https://www.w3.org/2001/xml.xsd"
+            path = schema_dir / "xml.xsd"
+            print(f"Downloading {url} to {path}...")
+            try:
+                urllib.request.urlretrieve(url, path)
+            except Exception as e:
+                print(f"Error downloading xml.xsd: {e}")
+                if path.exists():
+                    path.unlink()
+                return
+
+        print("Schema download complete.")

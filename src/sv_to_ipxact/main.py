@@ -72,7 +72,19 @@ Examples:
     parser.add_argument(
         '--validate',
         action='store_true',
-        help='Validate the generated IP-XACT file'
+        help='Validate the generated IP-XACT file against the remote schema (default)'
+    )
+
+    parser.add_argument(
+        '--validate-local',
+        action='store_true',
+        help='Validate the generated IP-XACT file against a local schema'
+    )
+
+    parser.add_argument(
+        '--no-validate',
+        action='store_true',
+        help='Do not validate the generated IP-XACT file'
     )
 
     parser.add_argument(
@@ -170,8 +182,16 @@ Examples:
     # Step 4: Generate IP-XACT
     print("[4] Generating IP-XACT...")
     try:
+        validation_type = 'none'
+        if args.validate:
+            validation_type = 'remote'
+        if args.validate_local:
+            validation_type = 'local'
+        if args.no_validate:
+            validation_type = 'none'
+
         generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version)
-        generator.write_to_file(str(output_path), args.validate)
+        generator.write_to_file(str(output_path), validation_type)
     except Exception as e:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)
         return 1

@@ -39,8 +39,14 @@ sv_to_ipxact -i design.sv --rebuild
 # Use IP-XACT 2009 standard
 sv_to_ipxact -i design.sv --ipxact-2009
 
-# Validate the generated IP-XACT file
+# Validate the generated IP-XACT file against the remote schema
 sv_to_ipxact -i design.sv --validate
+
+# Validate the generated IP-XACT file against a local schema (downloads if not present)
+sv_to_ipxact -i design.sv --validate-local
+
+# Do not validate the generated IP-XACT file
+sv_to_ipxact -i design.sv --no-validate
 
 # Verbose output
 sv_to_ipxact -i design.sv -v
@@ -55,7 +61,9 @@ sv_to_ipxact -i design.sv -v
 - `--cache`: Cache file path (default: `.libs_cache.json`)
 - `--threshold`: Matching threshold 0.0-1.0 (default: 0.6)
 - `--ipxact-2009`: Use IP-XACT 2009 standard (default: 2014)
-- `--validate`: Validate the generated IP-XACT file
+- `--validate`: Validate the generated IP-XACT file against the remote schema
+- `--validate-local`: Validate the generated IP-XACT file against a local schema (downloads if not present)
+- `--no-validate`: Do not validate the generated IP-XACT file
 - `-v, --verbose`: Verbose output
 
 ## Examples
@@ -147,6 +155,7 @@ sv_to_ipxact/
 3.  **Signal Grouping**: Groups signals with a common prefix.
 4.  **Protocol Matching**: Compares each group against AMBA protocols to find the best match.
 5.  **IP-XACT Generation**: Creates the XML file including busInterfaces and portMaps.
+6.  **Local Schema Download (for --validate-local)**: If local schema files are not found in `schemas/IPXACT-<version>/`, they are automatically downloaded from Accellera's official website.
 
 ## Library Updates
 
@@ -262,7 +271,7 @@ make run-examples   # Run all examples
 make rebuild-cache  # Rebuild library cache
 
 # Clean
-make clean          # Remove build artifacts
+clean:          # Remove build artifacts, cache files, and downloaded schemas
 make clean-all      # Remove all generated files
 
 # CI

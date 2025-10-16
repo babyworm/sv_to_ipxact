@@ -158,6 +158,7 @@ clean: ## Remove build artifacts and cache files
 	rm -rf htmlcov/
 	rm -rf .coverage
 	rm -f .libs_cache.json
+	rm -rf schemas/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name "*.pyo" -delete
