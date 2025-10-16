@@ -202,6 +202,7 @@ Examples:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)
         return 1
 
+    print()
     # Step 5: Validate IP-XACT
     if validation_type != 'none':
         print("[5] Validating IP-XACT...")

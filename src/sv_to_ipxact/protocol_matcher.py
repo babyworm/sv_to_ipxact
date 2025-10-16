@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from .library_parser import ProtocolDefinition, SignalDefinition
 from .sv_parser import PortDefinition
 
+CAMEL_CASE_SPLIT_RE = re.compile(r'[A-Z]+(?=[A-Z][a-z0-9]|$)|[A-Z]?[a-z]+|[0-9]+')
+
 
 @dataclass
 class MatchScore:
@@ -85,19 +87,23 @@ class ProtocolMatcher:
 
         # First pass: exact matches after normalization
         for port in ports:
-            port_suffix = self._extract_signal_suffix(port.name)
-            if not port_suffix:
-                continue
+            for candidate in self._get_port_suffix_candidates(port.name):
+                norm_suffix = self._normalize_name(candidate)
 
-            norm_suffix = self._normalize_name(port_suffix)
+                if norm_suffix not in logical_signals:
+                    continue
 
-            if norm_suffix in logical_signals:
                 signal_def = logical_signals[norm_suffix]
+
+                # Avoid mapping the same logical signal more than once
+                if signal_def.logical_name in matched:
+                    continue
 
                 # Check direction compatibility
                 if self._check_direction_compatible(port.direction, signal_def.direction, mode):
                     matched[signal_def.logical_name] = port.name
                     remaining_ports.discard(port.name)
+                    break
 
         # Calculate score
         required_signals = [s for s in signal_defs if s.presence == 'required']
@@ -140,23 +146,65 @@ class ProtocolMatcher:
         )
 
     def _extract_signal_suffix(self, port_name: str) -> Optional[str]:
-        """Extract the signal name suffix (after prefix)."""
-        # Remove common prefixes
-        # e.g., M_AXI_AWADDR -> AWADDR
-        #       s_axi_awvalid -> awvalid
-        #       axi_m_arready -> arready
+        """Return a heuristic best-effort suffix for backward compatibility."""
+        candidates = self._get_port_suffix_candidates(port_name)
+        if not candidates:
+            return None
 
-        # Try underscore-separated
-        parts = port_name.split('_')
-        if len(parts) >= 2:
-            # Take everything after the first 1-2 parts
-            # M_AXI_AWADDR -> AWADDR
-            if len(parts) >= 3:
-                return '_'.join(parts[2:])
-            else:
-                return parts[-1]
+        # Prefer the most specific single-token candidate without digits
+        for candidate in reversed(candidates):
+            if '_' not in candidate and not re.search(r'\d', candidate):
+                return candidate
 
-        return port_name
+        # Fallback to any candidate without digits
+        for candidate in reversed(candidates):
+            if not re.search(r'\d', candidate):
+                return candidate
+
+        return candidates[-1]
+
+    def _get_port_suffix_candidates(self, port_name: str) -> List[str]:
+        """Generate possible suffix candidates from a port name.
+
+        Generates every contiguous token slice (left/right) and digit-trimmed
+        variants so that aggressive prefixes/suffixes do not prevent a match.
+        """
+
+        tokens = self._split_port_tokens(port_name)
+        if not tokens:
+            return []
+
+        candidates: List[str] = []
+        seen: Set[str] = set()
+
+        for start in range(len(tokens)):
+            for end in range(start, len(tokens)):
+                chunk_tokens = tokens[start:end + 1]
+                candidate = '_'.join(chunk_tokens)
+                if candidate and candidate not in seen:
+                    candidates.append(candidate)
+                    seen.add(candidate)
+
+                # Also consider variant with trailing digits removed
+                trimmed = re.sub(r'\d+$', '', candidate)
+                if trimmed and trimmed not in seen:
+                    candidates.append(trimmed)
+                    seen.add(trimmed)
+
+        return candidates
+
+    def _split_port_tokens(self, port_name: str) -> List[str]:
+        """Split a port name into meaningful tokens."""
+        if not port_name:
+            return []
+
+        sanitized = port_name.replace('-', '_')
+        if '_' in sanitized:
+            parts = [part for part in sanitized.split('_') if part]
+        else:
+            parts = CAMEL_CASE_SPLIT_RE.findall(port_name)
+
+        return parts or [port_name]
 
     def _normalize_name(self, name: str) -> str:
         """Normalize signal name for comparison."""

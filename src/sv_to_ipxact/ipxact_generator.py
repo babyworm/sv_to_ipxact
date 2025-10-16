@@ -343,7 +343,9 @@ class IPXACTGenerator:
 
         command = ["xmllint", "--noout", "--schema", schema_url, xml_path]
         print(f"Validating '{xml_path}' against {schema_url}...")
-        print(f"  Validation command: {" ".join(command)}")
+        print(f"- Validation command: {" ".join(command)}")
+        print("  - Validation In-progress")
+        print()
         try:
             result = subprocess.run(
                 command,

@@ -51,11 +51,12 @@ class TestProtocolMatcher:
         assert matcher._normalize_name("awaddr") == "AWADDR"
         assert matcher._normalize_name("AW_ADDR") == "AWADDR"
 
-    def test_extract_signal_suffix(self, matcher):
-        """Test signal suffix extraction."""
-        assert matcher._extract_signal_suffix("M_AXI_AWADDR") == "AWADDR"
-        assert matcher._extract_signal_suffix("s_axi_awvalid") == "awvalid"
-        assert matcher._extract_signal_suffix("axi_m_arready") == "arready"
+    def test_port_suffix_candidates(self, matcher):
+        """Suffix candidate generation should surface meaningful slices."""
+        assert "AWADDR" in matcher._get_port_suffix_candidates("M_AXI_AWADDR")
+        assert "haddr" in matcher._get_port_suffix_candidates("debug_m0_slv_haddr")
+        assert "AWADDR" in matcher._get_port_suffix_candidates("M_AXI_AWADDR_M0")
+        assert "awaddr" in matcher._get_port_suffix_candidates("axi_awaddr0")
 
     def test_direction_compatibility(self, matcher):
         """Test direction compatibility checking."""
@@ -86,6 +87,19 @@ class TestProtocolMatcher:
         assert bus_interface.protocol.name == "SimpleProtocol"
         assert bus_interface.interface_mode == "master"
         assert len(bus_interface.port_maps) == 3
+
+    def test_match_with_prefix_and_suffix_noise(self, matcher, simple_protocol):
+        """Ports with extra prefixes/suffixes should still match logical names."""
+        ports = [
+            PortDefinition("debug_m0_slv_data_ch0", "output", 8, 7, 0),
+            PortDefinition("debug_m0_slv_valid_ch0", "output", 1),
+            PortDefinition("debug_m0_slv_ready_ch0", "input", 1),
+        ]
+
+        bus_interface = matcher.match_port_group("debug_m0_slv", ports)
+
+        assert bus_interface is not None
+        assert set(bus_interface.port_maps.values()) == {p.name for p in ports}
 
     def test_match_partial(self, matcher, simple_protocol):
         """Test partial match (missing optional signals)."""

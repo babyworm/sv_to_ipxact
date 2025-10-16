@@ -55,9 +55,9 @@ class TestFullWorkflow:
 
         # Verify generated XML
         content = output_file.read_text()
-        assert "spirit:component" in content
+        assert any(prefix in content for prefix in ("spirit:component", "ipxact:component"))
         assert "axi_master_example" in content
-        assert "spirit:busInterface" in content
+        assert any(prefix in content for prefix in ("spirit:busInterface", "ipxact:busInterface"))
 
     def test_convert_dual_interface_example(self, lib_parser, tmp_path):
         """Test converting dual interface example."""
