@@ -5,7 +5,7 @@ A tool to convert SystemVerilog modules into IP-XACT component definitions. It a
 ## Key Features
 
 - SystemVerilog module parser (supports ANSI and non-ANSI styles)
-- Library of 89 AMBA protocol definitions (AMBA2~5)
+- Library of AMBA (AMBA2~5) and JEDEC DFI4 protocol definitions
 - Automatic bus interface matching (based on signal prefixes)
 - Dynamic library loading and caching
 - IP-XACT (IEEE 1685-2009, 2014, 2022) XML generation

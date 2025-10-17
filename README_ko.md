@@ -5,7 +5,7 @@ SystemVerilog 모듈을 IP-XACT 컴포넌트 정의로 변환하는 도구입니
 ## 주요 기능
 
 - SystemVerilog 모듈 파서 (ANSI 및 non-ANSI 스타일 지원)
-- 89개의 AMBA 프로토콜 정의 라이브러리 (AMBA2~5)
+- AMBA (AMBA2~5) 및 JEDEC DFI4 프로토콜 정의 라이브러리
 - 자동 버스 인터페이스 매칭 (신호 prefix 기반)
 - 동적 라이브러리 로딩 및 캐싱
 - IP-XACT (IEEE 1685-2009, 2014, 2022) XML 생성
