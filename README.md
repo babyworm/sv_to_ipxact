@@ -8,7 +8,7 @@ A tool to convert SystemVerilog modules into IP-XACT component definitions. It a
 - Library of 89 AMBA protocol definitions (AMBA2~5)
 - Automatic bus interface matching (based on signal prefixes)
 - Dynamic library loading and caching
-- IP-XACT (IEEE 1685-2009) XML generation
+- IP-XACT (IEEE 1685-2009, 2014, 2022) XML generation
 
 ## Installation
 
@@ -121,7 +121,7 @@ Two bus interfaces are automatically recognized and mapped respectively.
 - ATB, LPI
 
 ### AMBA4
-- AXI4, AXI4-Lite, AXI4-Stream
+- AXI4, AXI4-Lite, AXI4Stream
 - AXI4_RO, AXI4_WO
 - APB4
 - ACE, ACE-Lite, ACE-Lite_RO, ACE-Lite_WO
@@ -135,6 +135,9 @@ Two bus interfaces are automatically recognized and mapped respectively.
 - ACE5, ACE5-Lite, ACE5-LiteACP, ACE5-LiteDVM
 - CHI (Versions A~H, RND/RNF/RNI/SNF/SNI)
 - ATB, CXS, GFB, LTI
+
+### JEDEC
+- DFI4
 
 ## Project Structure
 

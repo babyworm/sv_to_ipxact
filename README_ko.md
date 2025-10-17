@@ -8,7 +8,7 @@ SystemVerilog 모듈을 IP-XACT 컴포넌트 정의로 변환하는 도구입니
 - 89개의 AMBA 프로토콜 정의 라이브러리 (AMBA2~5)
 - 자동 버스 인터페이스 매칭 (신호 prefix 기반)
 - 동적 라이브러리 로딩 및 캐싱
-- IP-XACT (IEEE 1685-2009) XML 생성
+- IP-XACT (IEEE 1685-2009, 2014, 2022) XML 생성
 
 ## 설치
 
@@ -121,7 +121,7 @@ module dual_interface (
 - ATB, LPI
 
 ### AMBA4
-- AXI4, AXI4-Lite, AXI4-Stream
+- AXI4, AXI4-Lite, AXI4Stream
 - AXI4_RO, AXI4_WO
 - APB4
 - ACE, ACE-Lite, ACE-Lite_RO, ACE-Lite_WO
@@ -135,6 +135,9 @@ module dual_interface (
 - ACE5, ACE5-Lite, ACE5-LiteACP, ACE5-LiteDVM
 - CHI (A~H 버전, RND/RNF/RNI/SNF/SNI)
 - ATB, CXS, GFB, LTI
+
+### JEDEC
+- DFI4
 
 ## 프로젝트 구조
 
