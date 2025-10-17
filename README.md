@@ -111,16 +111,19 @@ Two bus interfaces are automatically recognized and mapped respectively.
 
 ## Supported Protocols
 
-### AMBA2
+### AMBA
+AMBA IP-XACT bus definitions from ARM (https://developer.arm.com/Architectures/AMBA#Downloads) 
+
+#### AMBA2
 - AHB
 
-### AMBA3
+#### AMBA3
 - AXI, AXI_RO, AXI_WO
 - APB
 - AHB-Lite, AHBLiteInitiator, AHBLiteTarget
 - ATB, LPI
 
-### AMBA4
+#### AMBA4
 - AXI4, AXI4-Lite, AXI4Stream
 - AXI4_RO, AXI4_WO
 - APB4
@@ -128,7 +131,7 @@ Two bus interfaces are automatically recognized and mapped respectively.
 - ACP, ATB
 - P-Channel, Q-Channel
 
-### AMBA5
+#### AMBA5
 - AXI5, AXI5-Lite, AXI5-Stream
 - APB5
 - AHB5Initiator, AHB5Target
@@ -137,7 +140,22 @@ Two bus interfaces are automatically recognized and mapped respectively.
 - ATB, CXS, GFB, LTI
 
 ### JEDEC
+
+#### DFI
+
+Unoffical, personally generated for testing purpose
+
 - DFI4
+
+### UCIe
+
+Unoffical, personally generated for testing purpose
+
+(i) Not implemented yet 
+
+
+
+
 
 ## Project Structure
 

@@ -1,19 +1,19 @@
 # sv_to_ipxact
 
-SystemVerilog 모듈을 IP-XACT 컴포넌트 정의로 변환하는 도구입니다. AMBA 버스 프로토콜을 자동으로 인식하고 busInterface와 portMap을 생성합니다.
+SystemVerilog 모듈을 IP-XACT 컴포넌트 정의로 변환하는 도구입니다. AMBA 버스 프로토콜을 자동으로 인식하고 busInterfaces 및 portMaps를 생성합니다.
 
 ## 주요 기능
 
-- SystemVerilog 모듈 파서 (ANSI 및 non-ANSI 스타일 지원)
+- SystemVerilog 모듈 파서 (ANSI 및 비-ANSI 스타일 지원)
 - AMBA (AMBA2~5) 및 JEDEC DFI4 프로토콜 정의 라이브러리
-- 자동 버스 인터페이스 매칭 (신호 prefix 기반)
+- 자동 버스 인터페이스 매칭 (신호 접두사 기반)
 - 동적 라이브러리 로딩 및 캐싱
 - IP-XACT (IEEE 1685-2009, 2014, 2022) XML 생성
 
 ## 설치
 
 ```bash
-# Python 가상환경 생성
+# Python 가상 환경 생성
 python3 -m venv venv
 source venv/bin/activate  # Linux/Mac
 # 또는: venv\Scripts\activate  # Windows
@@ -24,7 +24,7 @@ pip install -e .
 
 ## 사용법
 
-### 기본 사용
+### 기본 사용법
 
 ```bash
 # 입력 파일만 지정 (출력: design.ipxact)
@@ -33,7 +33,7 @@ sv_to_ipxact -i design.sv
 # 출력 파일 지정
 sv_to_ipxact -i design.sv -o output.xml
 
-# 라이브러리 캐시 재생성
+# 라이브러리 캐시 재구축
 sv_to_ipxact -i design.sv --rebuild
 
 # IP-XACT 2009 표준 사용
@@ -42,13 +42,13 @@ sv_to_ipxact -i design.sv --ipxact-2009
 # IP-XACT 2022 표준 사용
 sv_to_ipxact -i design.sv --ipxact-2022
 
-# 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
+# 생성된 IP-XACT 파일을 원격 스키마에 대해 검증
 sv_to_ipxact -i design.sv --validate
 
-# 생성된 IP-XACT 파일을 로컬 스키마에 대해 유효성 검사 (없으면 다운로드)
+# 생성된 IP-XACT 파일을 로컬 스키마에 대해 검증 (없으면 다운로드)
 sv_to_ipxact -i design.sv --validate-local
 
-# 생성된 IP-XACT 파일 유효성 검사 안 함
+# 생성된 IP-XACT 파일을 검증하지 않음
 sv_to_ipxact -i design.sv --no-validate
 
 # 상세 출력
@@ -59,20 +59,20 @@ sv_to_ipxact -i design.sv -v
 
 - `-i, --input`: 입력 SystemVerilog 파일 (필수)
 - `-o, --output`: 출력 IP-XACT 파일 (기본값: `<input>.ipxact`)
-- `--rebuild`: 라이브러리 캐시 강제 재생성
+- `--rebuild`: 라이브러리 캐시 강제 재구축
 - `--libs`: 라이브러리 디렉토리 경로 (기본값: `libs`)
 - `--cache`: 캐시 파일 경로 (기본값: `.libs_cache.json`)
 - `--threshold`: 매칭 임계값 0.0-1.0 (기본값: 0.6)
 - `--ipxact-2009`: IP-XACT 2009 표준 사용 (기본값: 2014)
 - `--ipxact-2022`: IP-XACT 2022 표준 사용 (기본값: 2014)
-- `--validate`: 생성된 IP-XACT 파일을 원격 스키마에 대해 유효성 검사
-- `--validate-local`: 생성된 IP-XACT 파일을 로컬 스키마에 대해 유효성 검사 (없으면 다운로드)
-- `--no-validate`: 생성된 IP-XACT 파일 유효성 검사 안 함
+- `--validate`: 생성된 IP-XACT 파일을 원격 스키마에 대해 검증
+- `--validate-local`: 생성된 IP-XACT 파일을 로컬 스키마에 대해 검증 (없으면 다운로드)
+- `--no-validate`: 생성된 IP-XACT 파일을 검증하지 않음
 - `-v, --verbose`: 상세 출력
 
-## 예제
+## 예시
 
-### AXI4 Master 인터페이스
+### AXI4 마스터 인터페이스
 
 ```systemverilog
 module axi_master_example (
@@ -82,7 +82,7 @@ module axi_master_example (
     // AXI4 Master
     output wire [31:0] M_AXI_AWADDR,
     output wire [7:0]  M_AXI_AWLEN,
-    // ... 기타 AXI4 신호들
+    // ... 기타 AXI4 신호
 );
 ```
 
@@ -91,7 +91,7 @@ module axi_master_example (
 sv_to_ipxact -i examples/axi_master_example.sv
 ```
 
-결과: `M_AXI` 프리픽스를 가진 신호들이 AXI4 master busInterface로 매핑됨
+결과: `M_AXI` 접두사를 가진 신호는 AXI4 마스터 busInterface에 매핑됩니다.
 
 ### 다중 인터페이스
 
@@ -107,20 +107,23 @@ module dual_interface (
 );
 ```
 
-두 개의 버스 인터페이스가 자동으로 인식되어 각각 매핑됩니다.
+두 개의 버스 인터페이스가 자동으로 인식되고 각각 매핑됩니다.
 
 ## 지원 프로토콜
 
-### AMBA2
+### AMBA
+ARM에서 제공하는 AMBA IP-XACT 버스 정의 (https://developer.arm.com/Architectures/AMBA#Downloads)
+
+#### AMBA2
 - AHB
 
-### AMBA3
+#### AMBA3
 - AXI, AXI_RO, AXI_WO
 - APB
 - AHB-Lite, AHBLiteInitiator, AHBLiteTarget
 - ATB, LPI
 
-### AMBA4
+#### AMBA4
 - AXI4, AXI4-Lite, AXI4Stream
 - AXI4_RO, AXI4_WO
 - APB4
@@ -128,16 +131,27 @@ module dual_interface (
 - ACP, ATB
 - P-Channel, Q-Channel
 
-### AMBA5
+#### AMBA5
 - AXI5, AXI5-Lite, AXI5-Stream
 - APB5
 - AHB5Initiator, AHB5Target
 - ACE5, ACE5-Lite, ACE5-LiteACP, ACE5-LiteDVM
-- CHI (A~H 버전, RND/RNF/RNI/SNF/SNI)
+- CHI (버전 A~H, RND/RNF/RNI/SNF/SNI)
 - ATB, CXS, GFB, LTI
 
 ### JEDEC
+
+#### DFI
+
+비공식, 테스트 목적으로 개인적으로 생성됨
+
 - DFI4
+
+### UCIe
+
+비공식, 테스트 목적으로 개인적으로 생성됨
+
+(i) 아직 구현되지 않음
 
 ## 프로젝트 구조
 
@@ -148,41 +162,41 @@ sv_to_ipxact/
 │   ├── sv_parser.py           # SystemVerilog 파서
 │   ├── protocol_matcher.py   # 프로토콜 매칭 알고리즘
 │   ├── ipxact_generator.py   # IP-XACT XML 생성기
-│   └── main.py                # CLI 엔트리포인트
+│   └── main.py                # CLI 진입점
 ├── libs/                      # AMBA 프로토콜 정의 (ARM 제공)
-├── examples/                  # 예제 파일
+├── examples/                  # 예시 파일
 ├── CLAUDE.md                  # 개발자 가이드
 └── README.md
 ```
 
-## 동작 방식
+## 작동 방식
 
-1.  **라이브러리 로딩**: `libs/` 디렉토리의 IP-XACT 프로토콜 정의 파싱 (첫 실행 시 캐싱)
-2.  **SystemVerilog 파싱**: 모듈 포트 추출
-3.  **신호 그룹화**: 공통 prefix를 가진 신호들을 그룹화
-4.  **프로토콜 매칭**: 각 그룹을 AMBA 프로토콜과 비교하여 최적 매치 선택
-5.  **IP-XACT 생성**: busInterface와 portMap을 포함한 XML 생성
-6.  **로컬 스키마 다운로드 (--validate-local 옵션 사용 시)**: `schemas/IPXACT-<version>/`에 로컬 스키마 파일이 없으면 Accellera 공식 웹사이트에서 자동으로 다운로드됩니다.
+1.  **라이브러리 로딩**: `libs/` 디렉토리의 IP-XACT 프로토콜 정의를 파싱합니다 (첫 실행 시 캐시됨).
+2.  **SystemVerilog 파싱**: 모듈 포트를 추출합니다.
+3.  **신호 그룹화**: 공통 접두사를 가진 신호들을 그룹화합니다.
+4.  **프로토콜 매칭**: 각 그룹을 AMBA 프로토콜과 비교하여 최적의 매치를 찾습니다.
+5.  **IP-XACT 생성**: busInterfaces 및 portMaps를 포함하는 XML 파일을 생성합니다.
+6.  **로컬 스키마 다운로드 (--validate-local용)**: `schemas/IPXACT-<version>/`에 로컬 스키마 파일이 없으면 Accellera 공식 웹사이트에서 자동으로 다운로드됩니다.
 
 ## 라이브러리 업데이트
 
-`libs/` 디렉토리에 새로운 프로토콜 정의를 추가하면 자동으로 인식됩니다:
+`libs/` 디렉토리에 추가된 새 프로토콜 정의는 자동으로 인식됩니다:
 
 ```bash
 # 새 프로토콜 추가 후
 sv_to_ipxact -i design.sv --rebuild
 ```
 
-라이브러리 캐시는 자동으로 무효화되며, `--rebuild` 옵션으로 수동 재생성 가능합니다.
+라이브러리 캐시는 자동으로 무효화되며, `--rebuild` 옵션으로 수동으로 재구축할 수 있습니다.
 
 ## 문서
 
 ### 온라인 문서 생성
 
-프로젝트의 전체 API 문서와 상세 가이드를 생성할 수 있습니다:
+프로젝트의 전체 API 문서 및 상세 가이드를 생성할 수 있습니다:
 
 ```bash
-# 문서 생성 의존성 설치
+# 문서 종속성 설치
 pip install -r docs_requirements.txt
 
 # 문서 생성
@@ -192,23 +206,23 @@ pip install -r docs_requirements.txt
 cd docs && make html
 ```
 
-생성된 문서는 `docs/_build/html/index.html` 에서 확인할 수 있습니다.
+생성된 문서는 `docs/_build/html/index.html`에서 찾을 수 있습니다.
 
 ### 문서 내용
 
-- **설치 가이드**: 설치 방법 및 의존성
-- **사용 가이드**: 명령행 옵션 및 워크플로우
-- **API 문서**: 전체 Python API 레퍼런스
-- **예제 모음**: 다양한 사용 예제와 설명
-- **개발자 가이드**: [CLAUDE.md](CLAUDE.md) - 내부 아키텍처 및 개발 지침
+- **설치 가이드**: 설치 방법 및 종속성.
+- **사용 가이드**: 명령줄 옵션 및 워크플로우.
+- **API 문서**: 전체 Python API 참조.
+- **예시**: 다양한 사용 예시 및 설명.
+- **개발자 가이드**: [CLAUDE.md](CLAUDE.md) - 내부 아키텍처 및 개발 지침.
 
-### 소스코드 문서화
+### 소스 코드 문서
 
-모든 Python 모듈은 상세한 docstring을 포함하고 있습니다:
+모든 Python 모듈에는 상세한 독스트링이 포함되어 있습니다:
 
-- Google 스타일 docstring
+- Google 스타일 독스트링
 - 타입 힌트 포함
-- 사용 예제 포함
+- 사용 예시 포함
 - Sphinx를 통한 자동 문서 생성
 
 예시:
@@ -222,10 +236,10 @@ help(SystemVerilogParser.parse_file)
 
 ## 테스트
 
-### 유닛 테스트 실행
+### 단위 테스트 실행
 
 ```bash
-# 유닛 테스트만 실행
+# 단위 테스트만 실행
 make test-unit
 
 # 통합 테스트 실행
@@ -234,7 +248,7 @@ make test-integration
 # 모든 테스트 실행
 make test-all
 
-# 커버리지 포함 테스트
+# 커버리지와 함께 테스트 실행
 make test-cov
 ```
 
@@ -246,11 +260,11 @@ make test-cov
 - **sv_parser.py**: 87%
 - **ipxact_generator.py**: 92% (통합 테스트)
 
-커버리지 리포트는 `htmlcov/index.html` 에서 확인할 수 있습니다.
+커버리지 보고서는 `htmlcov/index.html`에서 볼 수 있습니다.
 
-## Makefile 명령어
+## Makefile 명령
 
-프로젝트는 다양한 작업을 쉽게 수행할 수 있는 Makefile을 제공합니다:
+프로젝트는 다양한 작업을 쉽게 수행할 수 있도록 Makefile을 제공합니다:
 
 ```bash
 # 도움말 보기
@@ -260,33 +274,33 @@ make help
 make install-dev
 
 # 테스트
-make test           # 유닛 테스트
+make test           # 단위 테스트
 make test-all       # 모든 테스트
-make test-cov       # 커버리지 포함
+make test-cov       # 커버리지와 함께
 
 # 코드 품질
 make lint           # 린터 실행
-make format         # 코드 포맷팅
+make format         # 코드 포맷
 make check          # 린트 + 테스트
 
 # 문서
 make docs           # 문서 생성
-make docs-serve     # 문서 생성 후 브라우저에서 열기
+make docs-serve     # 문서 생성 및 브라우저에서 열기
 
-# 예제
-make run-examples   # 모든 예제 실행
-make rebuild-cache  # 라이브러리 캐시 재생성
+# 예시
+make run-examples   # 모든 예시 실행
+make rebuild-cache  # 라이브러리 캐시 재구축
 
 # 정리
-clean:          # 빌드 산출물, 캐시 파일 및 다운로드된 스키마 제거
-make clean-all      # 모든 생성 파일 제거
+clean:          # 빌드 아티팩트, 캐시 파일 및 다운로드된 스키마 제거
+make clean-all      # 모든 생성된 파일 제거
 
 # CI
 make ci             # 전체 CI 파이프라인
-make ci-quick       # 빠른 CI 체크
+make ci-quick       # 빠른 CI 확인
 ```
 
-### 자주 사용하는 명령어
+### 자주 사용되는 명령
 
 ```bash
 # 개발 시작
@@ -295,13 +309,13 @@ make install-dev
 # 코드 변경 후 테스트
 make test
 
-# 커밋 전 체크
+# 커밋 전 확인
 make check
 
-# 예제 실행
+# 예시 실행
 make run-examples
 ```
 
 ## 개발자 가이드
 
-상세한 개발 가이드는 [CLAUDE.md](CLAUDE.md)를 참조하세요.
+자세한 개발자 가이드는 [CLAUDE.md](CLAUDE.md)를 참조하십시오.
