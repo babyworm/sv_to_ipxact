@@ -68,7 +68,9 @@ IP-XACT files use these XML namespaces:
 
 ## Command Line Interface
 
-The converter should support the following command-line options:
+### SystemVerilog to IP-XACT Converter
+
+The converter supports the following command-line options:
 
 ```
 sv_to_ipxact -i <input.sv> [-o <output.ipxact>] [--rebuild]
@@ -89,6 +91,42 @@ sv_to_ipxact -i my_module.sv -o design.ipxact
 
 # Rebuild library cache (use after updating libs/)
 sv_to_ipxact -i my_module.sv --rebuild
+```
+
+### IP-XACT Validator
+
+The project also includes a standalone validation tool for IP-XACT files:
+
+```
+validate-ipxact <file.xml> [<file2.xml> ...] [--local|--remote|--info]
+```
+
+**Options**:
+- `files`: One or more IP-XACT XML files to validate (required)
+- `--local`: Validate against local schema using lxml (default)
+- `--local-xmllint`: Validate against local schema using xmllint
+- `--remote`: Validate against remote schema (requires internet and xmllint)
+- `--info`: Only print file information without validation
+
+**Features**:
+- Automatic version detection (2009, 2014, 2021)
+- Multiple validation methods (lxml, xmllint, remote)
+- Batch validation support
+- Detailed error reporting with line numbers
+
+**Example**:
+```bash
+# Validate a single file
+validate-ipxact component.xml
+
+# Validate multiple files
+validate-ipxact file1.xml file2.xml file3.xml
+
+# Validate against remote schema
+validate-ipxact component.xml --remote
+
+# Using wrapper script (without installation)
+./scripts/validate-ipxact.sh examples/*.ipxact
 ```
 
 ## Development Notes
