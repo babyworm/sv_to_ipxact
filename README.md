@@ -91,6 +91,57 @@ ipxact-converter input_2014.xml output_2021.xml 2021 --validate
 - `target_version`: Target IP-XACT version (`2009`, `2014`, `2021`) (required)
 - `--validate`: Validate the output file against the target schema
 
+### IP-XACT Validator
+
+A standalone validation tool for IP-XACT XML files. Supports automatic version detection and validation against both local and remote schemas.
+
+#### Basic Usage
+
+```bash
+# Validate using local schema (default)
+validate-ipxact my_component.xml
+
+# Validate using remote schema
+validate-ipxact my_component.xml --remote
+
+# Validate multiple files
+validate-ipxact file1.xml file2.xml file3.xml
+
+# Just print file information
+validate-ipxact my_component.xml --info
+```
+
+#### Options
+
+- `files`: One or more IP-XACT XML files to validate (required)
+- `--local`: Validate against local schema using lxml (default)
+- `--local-xmllint`: Validate against local schema using xmllint
+- `--remote`: Validate against remote schema (requires internet and xmllint)
+- `--info`: Only print file information without validation
+
+#### Using Without Installation
+
+If you haven't installed the package, you can use the wrapper script:
+
+```bash
+# Make the script executable (first time only)
+chmod +x scripts/validate-ipxact.sh
+
+# Validate IP-XACT files
+./scripts/validate-ipxact.sh examples/axi_master_example.2009.ipxact
+./scripts/validate-ipxact.sh examples/*.ipxact --local
+```
+
+#### Features
+
+- **Automatic version detection**: Detects IP-XACT 2009, 2014, or 2021 based on namespace
+- **Multiple validation methods**:
+  - Local validation using lxml (fast, no internet required)
+  - Local validation using xmllint (comprehensive)
+  - Remote validation (validates against official schemas)
+- **Batch validation**: Validate multiple files in one command
+- **Detailed error reporting**: Shows line numbers and error descriptions
+
 ## Examples
 
 ### AXI4 Master Interface
