@@ -54,7 +54,7 @@ test: test-unit ## Run all tests (alias for test-unit)
 
 test-unit: ## Run unit tests only
 	@echo "$(BLUE)Running unit tests...$(NC)"
-	$(PYTEST) -v $(TESTS_DIR) -m "not integration and not slow"
+	PYTHONPATH=src $(PYTEST) -v $(TESTS_DIR) -m "not integration and not slow"
 
 test-integration: ## Run integration tests
 	@echo "$(BLUE)Running integration tests...$(NC)"

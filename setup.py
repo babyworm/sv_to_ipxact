@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="sv_to_ipxact",
-    version="0.1.0",
+    name="ipxact-tools",
+    version="0.2.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
@@ -11,7 +11,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "sv_to_ipxact=sv_to_ipxact.main:main",
+            "sv-to-ipxact=sv_to_ipxact.main:main",
+            "ipxact-converter=ipxact_version_converter.main:main",
         ],
     },
     python_requires=">=3.8",

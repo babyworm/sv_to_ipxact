@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<spirit:component xmlns:spirit="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/component.xsd"><spirit:vendor xmlns:ns0="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">test.com</spirit:vendor>
+  <spirit:library xmlns:ns1="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">test_lib</spirit:library>
+  <spirit:name xmlns:ns2="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">test_component</spirit:name>
+  <spirit:version xmlns:ns3="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">1.0</spirit:version>
+</spirit:component>

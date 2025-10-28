@@ -70,6 +70,27 @@ sv_to_ipxact -i design.sv -v
 - `--no-validate`: Do not validate the generated IP-XACT file
 - `-v, --verbose`: Verbose output
 
+### IP-XACT Version Converter
+
+A tool to convert IP-XACT files between 2009, 2014, and 2021 versions.
+
+#### Basic Usage
+
+```bash
+# Convert a 2009 IP-XACT file to the 2014 version
+ipxact-converter input_2009.xml output_2014.xml 2014
+
+# Convert and validate the output file
+ipxact-converter input_2014.xml output_2021.xml 2021 --validate
+```
+
+#### Options
+
+- `input_file`: Input IP-XACT file path (required)
+- `output_file`: Output IP-XACT file path (required)
+- `target_version`: Target IP-XACT version (`2009`, `2014`, `2021`) (required)
+- `--validate`: Validate the output file against the target schema
+
 ## Examples
 
 ### AXI4 Master Interface
@@ -160,16 +181,21 @@ Unoffical, personally generated for testing purpose
 ## Project Structure
 
 ```
-sv_to_ipxact/
-├── src/sv_to_ipxact/
-│   ├── library_parser.py     # AMBA protocol XML parser
-│   ├── sv_parser.py           # SystemVerilog parser
-│   ├── protocol_matcher.py   # Protocol matching algorithm
-│   ├── ipxact_generator.py   # IP-XACT XML generator
-│   └── main.py                # CLI entry point
-├── libs/                      # AMBA protocol definitions (provided by ARM)
-├── examples/                  # Example files
-├── CLAUDE.md                  # Developer Guide
+ipxact-tools/
+├── src/
+│   ├── sv_to_ipxact/
+│   │   ├── ... (SystemVerilog to IP-XACT converter)
+│   └── ipxact_version_converter/
+│       ├── converter.py      # IP-XACT version conversion logic
+│       └── main.py           # CLI entry point
+├── libs/
+│   ├── amba.com/             # AMBA protocol definitions
+│   └── ipxact_schemas/       # IP-XACT schemas (2009, 2014, 2021)
+├── examples/                 # Example files
+├── tests/
+│   ├── sv_to_ipxact/
+│   └── ipxact_version_converter/
+├── CLAUDE.md                 # Developer Guide
 └── README.md
 ```
 
