@@ -133,10 +133,11 @@ validate-ipxact component.xml --remote
 
 ### Current State
 
-The repository is in early development:
-- README indicates project intent (in Korean)
-- AMBA library files are reference definitions (from ARM, read-only)
-- No parser/converter implementation exists yet
+The repository is fully implemented and verified:
+- Parser, matcher, and generator are functional.
+- Supports IP-XACT 2009, 2014, and 2022.
+- Includes robust parsing, heuristic tuning, and end-to-end validation.
+- Verified with comprehensive test cases.
 
 ### Implementation Approach
 
@@ -149,10 +150,22 @@ When implementing the converter:
    - `busInterfaces` section (mapped protocols)
    - `model/ports` section (unmapped signals)
    - `memoryMaps` if addressable components detected
+   - `addressSpaces` for master interfaces
+   - `fileSets` including source file
+   - `parameters` propagated from SV
 4. **Handle special cases**:
    - Multiple instances of same bus (e.g., dual AXI interfaces)
    - Partial bus implementations (subset of signals)
    - Custom signals intermixed with standard buses
+   - Mirror slave interfaces (implied from master definition)
+   - Clock and Reset attributes
+
+### Heuristic Tuning
+
+The protocol matcher uses a scoring system to identify the best protocol match for a group of signals.
+- **Score Calculation**: `(matched_required * required_weight + matched_optional * optional_weight) - (unmatched_ports * penalty_weight)`
+- **Ambiguity Detection**: If the score difference between the best match and the second best match is less than `ambiguity_threshold`, a warning is issued.
+- **Configuration**: All weights and thresholds are configurable via CLI arguments.
 
 ### Dynamic Library Loading
 

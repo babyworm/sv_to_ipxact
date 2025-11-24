@@ -1,0 +1,7 @@
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">
+  <spirit:vendor>user</spirit:vendor>
+  <spirit:library>Ambiguous</spirit:library>
+  <spirit:name>Ambiguous</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:isAddressable>false</spirit:isAddressable>
+</spirit:busDefinition>

@@ -9,6 +9,10 @@ A tool to convert SystemVerilog modules into IP-XACT component definitions. It a
 - Automatic bus interface matching (based on signal prefixes)
 - Dynamic library loading and caching
 - IP-XACT (IEEE 1685-2009, 2014, 2022) XML generation
+- **Heuristic Tuning**: Configurable matching thresholds and weights
+- **Ambiguity Handling**: Reporting of ambiguous matches
+- **Mirror Slave Support**: Automatic slave interface derivation
+- **Advanced Features**: Memory maps, address spaces, file sets, and bus parameter propagation
 
 ## Installation
 
@@ -63,6 +67,10 @@ sv_to_ipxact -i design.sv -v
 - `--libs`: Library directory path (default: `libs`)
 - `--cache`: Cache file path (default: `.libs_cache.json`)
 - `--threshold`: Matching threshold 0.0-1.0 (default: 0.6)
+- `--ambiguity-threshold`: Threshold for ambiguity warning (default: 0.05)
+- `--required-weight`: Weight for required signals (default: 1.0)
+- `--optional-weight`: Weight for optional signals (default: 0.3)
+- `--penalty-weight`: Penalty weight for unmatched ports (default: 0.05)
 - `--ipxact-2009`: Use IP-XACT 2009 standard (default: 2014)
 - `--ipxact-2022`: Use IP-XACT 2022 standard (default: 2014)
 - `--validate`: Validate the generated IP-XACT file against the remote schema
@@ -184,7 +192,7 @@ Two bus interfaces are automatically recognized and mapped respectively.
 ## Supported Protocols
 
 ### AMBA
-AMBA IP-XACT bus definitions from ARM (https://developer.arm.com/Architectures/AMBA#Downloads) 
+AMBA IP-XACT bus definitions from ARM (https://developer.arm.com/Architectures/AMBA#Downloads)
 
 #### AMBA2
 - AHB
@@ -223,7 +231,7 @@ Unoffical, personally generated for testing purpose
 
 Unoffical, personally generated for testing purpose
 
-(i) Not implemented yet 
+(i) Not implemented yet
 
 
 

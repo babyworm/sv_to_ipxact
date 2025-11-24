@@ -30,42 +30,66 @@ class BusInterface:
     port_maps: Dict[str, str]  # logical_name -> physical_port_name
 
 
+@dataclass
+class MatchingConfig:
+    """Configuration for protocol matching heuristics."""
+    match_threshold: float = 0.6
+    ambiguity_threshold: float = 0.05
+    required_weight: float = 1.0
+    optional_weight: float = 0.3
+    penalty_weight: float = 0.05
+
+
 class ProtocolMatcher:
     """Matches port groups to bus protocols."""
 
-    def __init__(self, protocols: Dict[str, ProtocolDefinition]):
+    def __init__(self, protocols: Dict[str, ProtocolDefinition], config: Optional[MatchingConfig] = None):
         self.protocols = protocols
-        self.match_threshold = 0.6  # Minimum score to consider a match
+        self.config = config or MatchingConfig()
 
     def match_port_group(self, prefix: str, ports: List[PortDefinition]) -> Optional[BusInterface]:
         """Try to match a group of ports to a bus protocol."""
-        best_match = None
-        best_score = 0
+        matches = []
 
         # Try to match against all known protocols
         for protocol in self.protocols.values():
             # Try as master interface
             master_score = self._calculate_match_score(ports, protocol, 'master')
-            if master_score and master_score.score > best_score:
-                best_score = master_score.score
-                best_match = master_score
+            if master_score and master_score.score >= self.config.match_threshold:
+                matches.append(master_score)
 
             # Try as slave interface
             slave_score = self._calculate_match_score(ports, protocol, 'slave')
-            if slave_score and slave_score.score > best_score:
-                best_score = slave_score.score
-                best_match = slave_score
+            if slave_score and slave_score.score >= self.config.match_threshold:
+                matches.append(slave_score)
 
-        # Check if best match is above threshold
-        if best_match and best_match.score >= self.match_threshold:
-            return BusInterface(
-                name=prefix,
-                protocol=best_match.protocol,
-                interface_mode=best_match.interface_mode,
-                port_maps=best_match.matched_signals
-            )
+        if not matches:
+            return None
 
-        return None
+        # Sort by score descending
+        matches.sort(key=lambda x: x.score, reverse=True)
+
+        best_match = matches[0]
+
+        # Check for ambiguity
+        if len(matches) > 1:
+            second_match = matches[1]
+            # If scores are very close
+            if (best_match.score - second_match.score) < self.config.ambiguity_threshold:
+                print(f"WARNING: Ambiguous match for prefix '{prefix}' (Score: {best_match.score:.2f}):")
+                print(f"  - Selected: {best_match.protocol.get_vlnv()} ({best_match.interface_mode})")
+                print(f"  - Candidate: {second_match.protocol.get_vlnv()} ({second_match.interface_mode})")
+                # List other close matches
+                for i in range(2, len(matches)):
+                    if (best_match.score - matches[i].score) < self.config.ambiguity_threshold:
+                        print(f"  - Candidate: {matches[i].protocol.get_vlnv()} ({matches[i].interface_mode})")
+
+        return BusInterface(
+            name=prefix,
+            protocol=best_match.protocol,
+            interface_mode=best_match.interface_mode,
+            port_maps=best_match.matched_signals
+        )
 
     def _calculate_match_score(self, ports: List[PortDefinition],
                                protocol: ProtocolDefinition,
@@ -119,16 +143,16 @@ class ProtocolMatcher:
             return None
 
         # Score calculation:
-        # - Required signals: 1.0 weight
-        # - Optional signals: 0.3 weight
-        # - Penalty for unmatched ports: -0.1 per port
-        required_score = matched_required / total_required if total_required > 0 else 0
-        optional_score = matched_optional / total_optional if total_optional > 0 else 0
+        # - Required signals: required_weight
+        # - Optional signals: optional_weight
+        # - Penalty for unmatched ports: penalty_weight per port
+        required_score = (matched_required / total_required) * self.config.required_weight if total_required > 0 else 0
+        optional_score = (matched_optional / total_optional) * self.config.optional_weight if total_optional > 0 else 0
 
         # Penalty for unmatched ports (might be noise/other signals)
-        unmatched_penalty = len(remaining_ports) * 0.05
+        unmatched_penalty = len(remaining_ports) * self.config.penalty_weight
 
-        score = (required_score * 1.0 + optional_score * 0.3) - unmatched_penalty
+        score = (required_score + optional_score) - unmatched_penalty
 
         # Must match at least some required signals
         if matched_required == 0:

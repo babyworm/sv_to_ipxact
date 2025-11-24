@@ -164,6 +164,27 @@ class LibraryParser:
                 if signal:
                     slave_signals.append(signal)
 
+        # If no slave signals defined, mirror master signals
+        if not slave_signals and master_signals:
+            for m_sig in master_signals:
+                # Mirror direction
+                if m_sig.direction == 'out':
+                    new_dir = 'in'
+                elif m_sig.direction == 'in':
+                    new_dir = 'out'
+                else:
+                    new_dir = m_sig.direction
+
+                slave_signals.append(SignalDefinition(
+                    logical_name=m_sig.logical_name,
+                    description=m_sig.description,
+                    direction=new_dir,
+                    width=m_sig.width,
+                    presence=m_sig.presence,
+                    is_clock=m_sig.is_clock,
+                    is_reset=m_sig.is_reset
+                ))
+
         return master_signals, slave_signals
 
     def _parse_signal_def(self, element, logical_name: str, description: str,

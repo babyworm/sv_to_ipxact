@@ -64,6 +64,34 @@ Examples:
     )
 
     parser.add_argument(
+        '--ambiguity-threshold',
+        type=float,
+        default=0.05,
+        help='Score difference to consider a match ambiguous (default: 0.05)'
+    )
+
+    parser.add_argument(
+        '--required-weight',
+        type=float,
+        default=1.0,
+        help='Weight for required signals (default: 1.0)'
+    )
+
+    parser.add_argument(
+        '--optional-weight',
+        type=float,
+        default=0.3,
+        help='Weight for optional signals (default: 0.3)'
+    )
+
+    parser.add_argument(
+        '--penalty-weight',
+        type=float,
+        default=0.05,
+        help='Penalty weight for unmatched ports (default: 0.05)'
+    )
+
+    parser.add_argument(
         '--ipxact-2009',
         action='store_true',
         help='Use IP-XACT 2009 standard (default: 2014)'
@@ -169,8 +197,15 @@ Examples:
             print(f"  - {prefix}: {len(ports)} ports")
         print()
 
-    matcher = ProtocolMatcher(lib_parser.protocols)
-    matcher.match_threshold = args.threshold
+    from .protocol_matcher import MatchingConfig
+    config = MatchingConfig(
+        match_threshold=args.threshold,
+        ambiguity_threshold=args.ambiguity_threshold,
+        required_weight=args.required_weight,
+        optional_weight=args.optional_weight,
+        penalty_weight=args.penalty_weight
+    )
+    matcher = ProtocolMatcher(lib_parser.protocols, config)
 
     bus_interfaces, unmatched_ports = matcher.match_all_groups(port_groups)
 
@@ -196,7 +231,7 @@ Examples:
         if args.no_validate:
             validation_type = 'none'
 
-        generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version)
+        generator = IPXACTGenerator(module, bus_interfaces, unmatched_ports, ipxact_version, str(input_path))
         generator.write_to_file(str(output_path))
     except Exception as e:
         print(f"Error generating IP-XACT: {e}", file=sys.stderr)

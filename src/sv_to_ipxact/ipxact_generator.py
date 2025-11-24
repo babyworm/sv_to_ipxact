@@ -56,11 +56,13 @@ class IPXACTGenerator:
     ]
 
     def __init__(self, module: ModuleDefinition, bus_interfaces: List[BusInterface],
-                 unmatched_ports: List[PortDefinition], version: str = '2014'):
+                 unmatched_ports: List[PortDefinition], version: str = '2014',
+                 file_path: str = None):
         self.module = module
         self.bus_interfaces = bus_interfaces
         self.unmatched_ports = unmatched_ports
         self.version = version
+        self.file_path = file_path
 
         if self.version == '2009':
             self.ns_prefix = 'spirit'
@@ -102,8 +104,22 @@ class IPXACTGenerator:
         if self.bus_interfaces:
             self._add_bus_interfaces(root)
 
+        # Add address spaces (for masters)
+        self._add_address_spaces(root)
+
+        # Add memory maps (for slaves)
+        self._add_memory_maps(root)
+
         # Add model section with ports
         self._add_model(root)
+
+        # Add file sets
+        if self.file_path:
+            self._add_file_sets(root)
+
+        # Add parameters (for 2014+)
+        if self.version != '2009' and self.module.parameters:
+            self._add_parameters(root)
 
         return root
 
@@ -122,6 +138,85 @@ class IPXACTGenerator:
 
         version = etree.SubElement(parent, f"{{{ns}}}version")
         version.text = "1.0"
+
+    def _add_address_spaces(self, parent: etree.Element):
+        """Add addressSpaces section for master interfaces."""
+        ns = self.namespaces[self.ns_prefix]
+
+        # Find master interfaces that are addressable
+        masters = [bi for bi in self.bus_interfaces
+                  if bi.interface_mode == 'master' and bi.protocol.is_addressable]
+
+        if not masters:
+            return
+
+        addr_spaces = etree.SubElement(parent, f"{{{ns}}}addressSpaces")
+
+        for master in masters:
+            space = etree.SubElement(addr_spaces, f"{{{ns}}}addressSpace")
+
+            name = etree.SubElement(space, f"{{{ns}}}name")
+            name.text = f"AS_{master.name}"
+
+            range_elem = etree.SubElement(space, f"{{{ns}}}range")
+            range_elem.text = "4294967296"  # Default 4GB
+
+            width = etree.SubElement(space, f"{{{ns}}}width")
+            width.text = "32"  # Default 32-bit
+
+    def _add_memory_maps(self, parent: etree.Element):
+        """Add memoryMaps section for slave interfaces."""
+        ns = self.namespaces[self.ns_prefix]
+
+        # Find slave interfaces that are addressable
+        slaves = [bi for bi in self.bus_interfaces
+                 if bi.interface_mode == 'slave' and bi.protocol.is_addressable]
+
+        if not slaves:
+            return
+
+        mem_maps = etree.SubElement(parent, f"{{{ns}}}memoryMaps")
+
+        for slave in slaves:
+            mem_map = etree.SubElement(mem_maps, f"{{{ns}}}memoryMap")
+
+            name = etree.SubElement(mem_map, f"{{{ns}}}name")
+            name.text = f"MM_{slave.name}"
+
+            addr_block = etree.SubElement(mem_map, f"{{{ns}}}addressBlock")
+
+            blk_name = etree.SubElement(addr_block, f"{{{ns}}}name")
+            blk_name.text = f"BLK_{slave.name}"
+
+            base_addr = etree.SubElement(addr_block, f"{{{ns}}}baseAddress")
+            base_addr.text = "0"
+
+            range_elem = etree.SubElement(addr_block, f"{{{ns}}}range")
+            range_elem.text = "4096"  # Default 4KB
+
+            width = etree.SubElement(addr_block, f"{{{ns}}}width")
+            width.text = "32"  # Default 32-bit
+
+            usage = etree.SubElement(addr_block, f"{{{ns}}}usage")
+            usage.text = "register"
+
+    def _add_file_sets(self, parent: etree.Element):
+        """Add fileSets section."""
+        ns = self.namespaces[self.ns_prefix]
+
+        file_sets = etree.SubElement(parent, f"{{{ns}}}fileSets")
+        file_set = etree.SubElement(file_sets, f"{{{ns}}}fileSet")
+
+        name = etree.SubElement(file_set, f"{{{ns}}}name")
+        name.text = "fs-sv"
+
+        file_elem = etree.SubElement(file_set, f"{{{ns}}}file")
+
+        file_name = etree.SubElement(file_elem, f"{{{ns}}}name")
+        file_name.text = self.file_path
+
+        file_type = etree.SubElement(file_elem, f"{{{ns}}}fileType")
+        file_type.text = "systemVerilogSource"
 
     def _add_bus_interfaces(self, parent: etree.Element):
         """Add busInterfaces section."""
@@ -155,6 +250,14 @@ class IPXACTGenerator:
                 mode_name = 'master' if bus_if.interface_mode == 'master' else 'slave'
                 mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
 
+                if bus_if.protocol.is_addressable:
+                    if bus_if.interface_mode == 'master':
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}addressSpaceRef")
+                        ref.set("addressSpaceRef", f"AS_{bus_if.name}")
+                    else:
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}memoryMapRef")
+                        ref.set("memoryMapRef", f"MM_{bus_if.name}")
+
                 # Port maps
                 port_maps = etree.SubElement(bus_interface_elem, f"{{{ns}}}portMaps")
 
@@ -181,7 +284,7 @@ class IPXACTGenerator:
                 # Abstraction types
                 abstraction_types = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionTypes")
                 abstraction_type = etree.SubElement(abstraction_types, f"{{{ns}}}abstractionType")
-                
+
                 # Abstraction type reference
                 abstraction_ref = etree.SubElement(abstraction_type, f"{{{ns}}}abstractionRef")
                 abstraction_ref.set("vendor", bus_if.protocol.vendor)
@@ -192,6 +295,14 @@ class IPXACTGenerator:
                 # Interface mode (initiator/target)
                 mode_name = 'initiator' if bus_if.interface_mode == 'master' else 'target'
                 mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
+
+                if bus_if.protocol.is_addressable:
+                    if bus_if.interface_mode == 'master':
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}addressSpaceRef")
+                        ref.set("addressSpaceRef", f"AS_{bus_if.name}")
+                    else:
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}memoryMapRef")
+                        ref.set("memoryMapRef", f"MM_{bus_if.name}")
 
                 # Port maps
                 port_maps = etree.SubElement(abstraction_type, f"{{{ns}}}portMaps")
@@ -219,7 +330,7 @@ class IPXACTGenerator:
                 # Abstraction types
                 abstraction_types = etree.SubElement(bus_interface_elem, f"{{{ns}}}abstractionTypes")
                 abstraction_type = etree.SubElement(abstraction_types, f"{{{ns}}}abstractionType")
-                
+
                 # Abstraction type reference
                 abstraction_ref = etree.SubElement(abstraction_type, f"{{{ns}}}abstractionRef")
                 abstraction_ref.set("vendor", bus_if.protocol.vendor)
@@ -230,6 +341,14 @@ class IPXACTGenerator:
                 # Interface mode (master/slave)
                 mode_name = 'master' if bus_if.interface_mode == 'master' else 'slave'
                 mode_elem = etree.SubElement(bus_interface_elem, f"{{{ns}}}{mode_name}")
+
+                if bus_if.protocol.is_addressable:
+                    if bus_if.interface_mode == 'master':
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}addressSpaceRef")
+                        ref.set("addressSpaceRef", f"AS_{bus_if.name}")
+                    else:
+                        ref = etree.SubElement(mode_elem, f"{{{ns}}}memoryMapRef")
+                        ref.set("memoryMapRef", f"MM_{bus_if.name}")
 
                 # Port maps
                 port_maps = etree.SubElement(abstraction_type, f"{{{ns}}}portMaps")
@@ -246,6 +365,75 @@ class IPXACTGenerator:
                     physical_port = etree.SubElement(port_map, f"{{{ns}}}physicalPort")
                     phys_name = etree.SubElement(physical_port, f"{{{ns}}}name")
                     phys_name.text = physical_name
+
+            # Add parameters for Clock and Reset interfaces
+            # Heuristic: check if protocol name contains 'Clock' or 'Reset'
+            is_clock = 'Clock' in bus_if.protocol.name
+            is_reset = 'Reset' in bus_if.protocol.name
+
+            if is_clock or is_reset:
+                parameters = etree.SubElement(bus_interface_elem, f"{{{ns}}}parameters")
+
+                if is_clock:
+                    param = etree.SubElement(parameters, f"{{{ns}}}parameter")
+                    name_elem = etree.SubElement(param, f"{{{ns}}}name")
+                    name_elem.text = "isClock"
+                    value_elem = etree.SubElement(param, f"{{{ns}}}value")
+                    value_elem.text = "true"
+
+                if is_reset:
+                    param = etree.SubElement(parameters, f"{{{ns}}}parameter")
+                    name_elem = etree.SubElement(param, f"{{{ns}}}name")
+                    name_elem.text = "isReset"
+                    value_elem = etree.SubElement(param, f"{{{ns}}}value")
+                    value_elem.text = "true"
+
+                    # For reset, we often want POLARITY. Defaulting to ACTIVE_LOW if n is in name
+                    # This is a guess, but helpful.
+                    polarity = "ACTIVE_LOW" if "_n" in bus_if.name.lower() else "ACTIVE_HIGH"
+                    param = etree.SubElement(parameters, f"{{{ns}}}parameter")
+                    name_elem = etree.SubElement(param, f"{{{ns}}}name")
+                    name_elem.text = "POLARITY"
+                    value_elem = etree.SubElement(param, f"{{{ns}}}value")
+                    value_elem.text = polarity
+
+            # Add bus parameters from SV parameters
+            # Heuristic: Look for parameters starting with interface name (case insensitive)
+            # e.g. M_AXI_ID_WIDTH -> ID_WIDTH for M_AXI interface
+            # Also handle C_ prefix (common in Xilinx IPs) e.g. C_M_AXI_ID_WIDTH
+
+            bus_params = {}
+            if_name_upper = bus_if.name.upper()
+
+            for param_name, param_value in self.module.parameters.items():
+                param_upper = param_name.upper()
+                suffix = None
+
+                # Check for direct prefix
+                if param_upper.startswith(if_name_upper + "_"):
+                    suffix = param_upper[len(if_name_upper)+1:]
+
+                # Check for C_ prefix
+                elif param_upper.startswith("C_" + if_name_upper + "_"):
+                    suffix = param_upper[len("C_" + if_name_upper)+1:]
+
+                if suffix:
+                    # Filter out common suffixes that might not be bus parameters if needed
+                    # For now, include everything
+                    bus_params[suffix] = param_name
+
+            if bus_params:
+                # Ensure parameters element exists (might have been created for clock/reset)
+                parameters = bus_interface_elem.find(f"{{{ns}}}parameters")
+                if parameters is None:
+                    parameters = etree.SubElement(bus_interface_elem, f"{{{ns}}}parameters")
+
+                for param_key, sv_param_name in sorted(bus_params.items()):
+                    param = etree.SubElement(parameters, f"{{{ns}}}parameter")
+                    name_elem = etree.SubElement(param, f"{{{ns}}}name")
+                    name_elem.text = param_key
+                    value_elem = etree.SubElement(param, f"{{{ns}}}value")
+                    value_elem.text = sv_param_name
 
     def _add_model(self, parent: etree.Element):
         """Add model section with ports."""
@@ -268,6 +456,9 @@ class IPXACTGenerator:
             env_identifier = etree.SubElement(view, f"{{{ns}}}envIdentifier")
             env_identifier.text = ":verilogSource:systemVerilog"
 
+        # Add model parameters (only for 2009)
+        if self.version == '2009' and self.module.parameters:
+            self._add_model_parameters(model)
 
         # Add ports section
         ports = etree.SubElement(model, f"{{{ns}}}ports")
@@ -297,14 +488,24 @@ class IPXACTGenerator:
             direction.text = 'out'
         elif port.direction == 'inout':
             direction.text = 'inout'
+        elif port.direction == 'interface':
+            direction.text = 'inout'  # Map interface ports to inout by default
 
-        # Vector (if width > 1)
-        if port.width > 1:
+        # Vector (if width > 1 or width is a string expression)
+        is_vector = False
+        if isinstance(port.width, int):
+            if port.width > 1:
+                is_vector = True
+        else:
+            # If width is a string (expression), it's a vector
+            is_vector = True
+
+        if is_vector:
             if self.version == '2009':
                 vector = etree.SubElement(wire, f"{{{ns}}}vector")
 
                 left = etree.SubElement(vector, f"{{{ns}}}left")
-                left.text = str(port.msb if port.msb is not None else port.width - 1)
+                left.text = str(port.msb if port.msb is not None else (port.width - 1 if isinstance(port.width, int) else 0))
 
                 right = etree.SubElement(vector, f"{{{ns}}}right")
                 right.text = str(port.lsb if port.lsb is not None else 0)
@@ -313,10 +514,58 @@ class IPXACTGenerator:
                 vector = etree.SubElement(vectors, f"{{{ns}}}vector")
 
                 left = etree.SubElement(vector, f"{{{ns}}}left")
-                left.text = str(port.msb if port.msb is not None else port.width - 1)
+                left.text = str(port.msb if port.msb is not None else (port.width - 1 if isinstance(port.width, int) else 0))
 
                 right = etree.SubElement(vector, f"{{{ns}}}right")
                 right.text = str(port.lsb if port.lsb is not None else 0)
+
+        # Type definition (for custom types)
+        if port.type_name:
+            wire_type_defs = etree.SubElement(wire, f"{{{ns}}}wireTypeDefs")
+            wire_type_def = etree.SubElement(wire_type_defs, f"{{{ns}}}wireTypeDef")
+
+            type_name_elem = etree.SubElement(wire_type_def, f"{{{ns}}}typeName")
+            type_name_elem.text = port.type_name
+
+    def _add_model_parameters(self, parent: etree.Element):
+        """Add modelParameters section."""
+        ns = self.namespaces[self.ns_prefix]
+
+        model_params = etree.SubElement(parent, f"{{{ns}}}modelParameters")
+
+        for name, param_def in self.module.parameters.items():
+            param = etree.SubElement(model_params, f"{{{ns}}}modelParameter")
+
+            name_elem = etree.SubElement(param, f"{{{ns}}}name")
+            name_elem.text = name
+
+            value_elem = etree.SubElement(param, f"{{{ns}}}value")
+            value_elem.text = param_def.value
+
+            # Data type
+            type_elem = etree.SubElement(param, f"{{{ns}}}dataType")
+            type_elem.text = param_def.type_name
+
+    def _add_parameters(self, parent: etree.Element):
+        """Add parameters section (for 2014+)."""
+        ns = self.namespaces[self.ns_prefix]
+
+        params = etree.SubElement(parent, f"{{{ns}}}parameters")
+
+        for name, param_def in self.module.parameters.items():
+            param = etree.SubElement(params, f"{{{ns}}}parameter")
+
+            name_elem = etree.SubElement(param, f"{{{ns}}}name")
+            name_elem.text = name
+
+            value_elem = etree.SubElement(param, f"{{{ns}}}value")
+            value_elem.text = param_def.value
+
+            # parameterId is optional but good practice if referenced
+            param.set("parameterId", name)
+
+            # Standard parameters don't have dataType child like modelParameter.
+            # We just output name and value.
 
     def write_to_file(self, output_path: str):
         """Write generated IP-XACT to file."""
