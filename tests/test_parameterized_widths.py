@@ -2,8 +2,14 @@
 
 import pytest
 from lxml import etree
-from sv_to_ipxact.sv_parser import SystemVerilogParser, PortDefinition, ModuleDefinition
+from sv_to_ipxact.sv_parser import (
+    SystemVerilogParser,
+    PortDefinition,
+    ModuleDefinition,
+    ParameterDefinition,
+)
 from sv_to_ipxact.ipxact_generator import IPXACTGenerator
+
 
 class TestParameterizedWidths:
     """Tests for parameterized width handling."""
@@ -50,8 +56,8 @@ class TestParameterizedWidths:
         module = parser.parse_file(str(sv_file))
 
         assert module.name == "param_test"
-        assert module.parameters["WIDTH"] == "32"
-        assert module.parameters["DEPTH"] == "1024"
+        assert module.parameters["WIDTH"].value == "32"
+        assert module.parameters["DEPTH"].value == "1024"
 
         # Check ports
         data_in = next(p for p in module.ports if p.name == "data_in")
@@ -63,24 +69,36 @@ class TestParameterizedWidths:
         # Create a mock module definition
         module = ModuleDefinition(
             name="param_module",
-            parameters={"WIDTH": "32", "ADDR_WIDTH": "16"},
+            parameters={
+                "WIDTH": ParameterDefinition("WIDTH", "32"),
+                "ADDR_WIDTH": ParameterDefinition("ADDR_WIDTH", "16"),
+            },
             ports=[
                 PortDefinition("clk", "input", 1),
-                PortDefinition("data", "input", "abs(WIDTH-1 - 0) + 1", msb="WIDTH-1", lsb=0),
-                PortDefinition("addr", "input", "abs(ADDR_WIDTH-1 - 0) + 1", msb="ADDR_WIDTH-1", lsb=0)
-            ]
+                PortDefinition(
+                    "data", "input", "abs(WIDTH-1 - 0) + 1", msb="WIDTH-1", lsb=0
+                ),
+                PortDefinition(
+                    "addr",
+                    "input",
+                    "abs(ADDR_WIDTH-1 - 0) + 1",
+                    msb="ADDR_WIDTH-1",
+                    lsb=0,
+                ),
+            ],
         )
 
-        generator = IPXACTGenerator(module, [], [], version='2014')
+        generator = IPXACTGenerator(module, [], [], version="2014")
         root = generator.generate()
 
-        ns = generator.namespaces['ipxact']
+        ns = generator.namespaces["ipxact"]
 
-        # Check model parameters
-        model_params = root.find(f".//{{{ns}}}modelParameters")
-        assert model_params is not None
+        # Check parameters
+        # For 2014, parameters are at component level
+        params_elem = root.find(f".//{{{ns}}}parameters")
+        assert params_elem is not None
 
-        params = model_params.findall(f"{{{ns}}}modelParameter")
+        params = params_elem.findall(f"{{{ns}}}parameter")
         assert len(params) == 2
 
         p1 = params[0]
@@ -89,7 +107,11 @@ class TestParameterizedWidths:
 
         # Check port vector bounds
         ports = root.find(f".//{{{ns}}}ports")
-        data_port = next(p for p in ports.findall(f"{{{ns}}}port") if p.find(f"{{{ns}}}name").text == "data")
+        data_port = next(
+            p
+            for p in ports.findall(f"{{{ns}}}port")
+            if p.find(f"{{{ns}}}name").text == "data"
+        )
 
         vector = data_port.find(f".//{{{ns}}}vector")
         assert vector is not None

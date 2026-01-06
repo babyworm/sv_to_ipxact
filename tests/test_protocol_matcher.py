@@ -2,11 +2,7 @@
 
 import pytest
 
-from sv_to_ipxact.protocol_matcher import (
-    ProtocolMatcher,
-    BusInterface,
-    MatchScore
-)
+from sv_to_ipxact.protocol_matcher import ProtocolMatcher, BusInterface, MatchScore
 from sv_to_ipxact.library_parser import ProtocolDefinition, SignalDefinition
 from sv_to_ipxact.sv_parser import PortDefinition
 
@@ -36,7 +32,7 @@ class TestProtocolMatcher:
             description="Simple test protocol",
             is_addressable=False,
             master_signals=master_signals,
-            slave_signals=slave_signals
+            slave_signals=slave_signals,
         )
 
     @pytest.fixture
@@ -163,7 +159,7 @@ class TestProtocolMatcher:
             "_ungrouped": [
                 PortDefinition("clk", "input", 1),
                 PortDefinition("rst_n", "input", 1),
-            ]
+            ],
         }
 
         bus_interfaces, unmatched = matcher.match_all_groups(port_groups)
@@ -174,7 +170,7 @@ class TestProtocolMatcher:
     def test_match_threshold(self, matcher):
         """Test matching threshold adjustment."""
         # With high threshold
-        matcher.match_threshold = 0.9
+        matcher.config.match_threshold = 0.9
 
         ports = [
             PortDefinition("M_SIMPLE_DATA", "output", 8),
@@ -186,6 +182,6 @@ class TestProtocolMatcher:
         assert bus_interface is None  # Below high threshold
 
         # With low threshold
-        matcher.match_threshold = 0.3
+        matcher.config.match_threshold = 0.3
         bus_interface = matcher.match_port_group("M_SIMPLE", ports)
         # Might match with lower threshold

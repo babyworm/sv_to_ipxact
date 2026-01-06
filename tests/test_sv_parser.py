@@ -4,11 +4,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from sv_to_ipxact.sv_parser import (
-    SystemVerilogParser,
-    PortDefinition,
-    ModuleDefinition
-)
+from sv_to_ipxact.sv_parser import SystemVerilogParser, PortDefinition, ModuleDefinition
 
 
 class TestPortDefinition:
@@ -142,8 +138,8 @@ class TestSystemVerilogParser:
         module = parser.parse_file(parametric_sv_file)
 
         assert module.name == "param_module"
-        assert module.parameters["WIDTH"] == "32"
-        assert module.parameters["DEPTH"] == "1024"
+        assert module.parameters["WIDTH"].value == "32"
+        assert module.parameters["DEPTH"].value == "1024"
 
     def test_group_ports_by_prefix(self, parser, axi_sv_file):
         """Test port grouping by prefix."""
@@ -187,9 +183,9 @@ class TestSystemVerilogParser:
     def test_parse_width_parametric(self, parser):
         """Test parametric width (not evaluated)."""
         msb, lsb, width = parser._parse_width("WIDTH-1:0")
-        assert msb is None
-        assert lsb is None
-        assert width == 1  # Placeholder
+        assert msb == "WIDTH-1"
+        assert lsb == 0
+        assert width == "abs(WIDTH-1 - 0) + 1"
 
     def test_get_module_info(self, parser, simple_sv_file):
         """Test module info string generation."""

@@ -1,30 +1,73 @@
-# Repository Guidelines
+# PROJECT KNOWLEDGE BASE
 
-## Project Structure & Module Organization
-- Source lives in `src/sv_to_ipxact/` with key modules for parsing (`sv_parser.py`), protocol matching (`protocol_matcher.py`), and XML output (`ipxact_generator.py`).
-- Shared AMBA definitions sit in `libs/amba.com/` and should be treated as read-only vendor data; use `--rebuild` when they change.
-- Tests are under `tests/` with mirrors of parser/matcher coverage; example SystemVerilog fixtures live in `examples/` and customer samples in `customer/`.
-- Sphinx docs are under `docs/`; tooling scripts (e.g., `generate_docs.sh`) expect a virtualenv in `venv/`.
+**Generated:** 2026-01-05
+**Commit:** Current
+**Branch:** main
 
-## Build, Test, and Development Commands
-- `make install-dev` creates `venv/` and installs runtime + dev dependencies.
-- `make test-unit`, `make test-integration`, and `make test-all` run pytest with the project `pytest.ini` markers.
-- `make lint` runs `pylint`, while `make format` or `make format-check` apply or verify `black` formatting.
-- `make docs` builds HTML docs; `make rebuild-cache` forces the protocol cache refresh after editing `libs/`.
+## OVERVIEW
+SystemVerilog to IP-XACT converter (SV2IPXACT).  
+Parses SV modules, identifies AMBA/JEDEC protocols via signal heuristics, and generates IEEE 1685 IP-XACT XML.
 
-## Coding Style & Naming Conventions
-- Target Python 3.8+ with 4-space indentation, module and function names in `snake_case`, and classes in `PascalCase`.
-- Keep public CLI entry points in `main.py`; shared helpers belong in topical modules (parser/matcher/generator).
-- Run `black` before committing; keep pylint warnings addressed or documented via inline `# pylint: disable=...` only when necessary.
-- Tests follow `test_*` module and function naming; fixtures should live in `conftest.py` if added.
+## STRUCTURE
+```
+.
+├── src/sv_to_ipxact/      # Core logic (Parser -> Matcher -> Generator)
+├── libs/                  # Protocol definitions (AMBA, JEDEC) & Schemas
+├── tests/                 # Pytest suite (mirrors src)
+├── examples/              # SV fixtures for integration testing
+└── docs/                  # Sphinx documentation
+```
 
-## Testing Guidelines
-- Pytest is the primary framework; respect `slow` and `integration` markers so CI can deselect them (`pytest -m "not slow"`).
-- Inspect coverage via `make test-cov`; aim to keep critical parsers and matchers near existing coverage levels (>85% reported in `htmlcov/`).
-- Add focused unit tests when adding protocol heuristics, and adjust example runs in `examples/` to exercise new cases.
+## WHERE TO LOOK
+| Task | Location | Notes |
+|------|----------|-------|
+| **Parsing Logic** | `src/sv_to_ipxact/sv_parser.py` | Regex/AST based SV parsing |
+| **Protocol Rules** | `libs/amba.com/` | XML definitions of bus protocols |
+| **Matching Logic** | `src/sv_to_ipxact/protocol_matcher.py` | Heuristic signal mapping |
+| **XML Output** | `src/sv_to_ipxact/ipxact_generator.py` | Jinja2/lxml based generation |
+| **CLI Entry** | `src/sv_to_ipxact/main.py` | Argument parsing & orchestration |
 
-## Commit & Pull Request Guidelines
-- Follow the existing history: short, imperative summaries (`add local validation`, `fix validation message`), optionally follow with details in the body.
-- Reference issue IDs or links in the body when applicable and describe validation (`make test-unit`, `make lint`) performed.
-- Pull requests should outline the SystemVerilog scenarios touched, note any library updates, and include screenshots only if XML diffs need illustration.
-- Keep PRs scoped; split protocol library updates from parser changes so reviewers can validate separately.
+## CODE MAP
+
+| Module | Key Symbols | Role |
+|--------|-------------|------|
+| `sv_parser` | `SystemVerilogParser` | Extracts ports, params, modules from text |
+| `protocol_matcher` | `ProtocolMatcher` | Fuzzy matches ports to bus definitions |
+| `ipxact_generator` | `IpxactGenerator` | Constructs valid IP-XACT XML tree |
+| `library_parser` | `LibraryManager` | Loads/Caches `libs/` protocol defs |
+| `validator` | `IpxactValidator` | Validates output against XSD schemas |
+
+## CONVENTIONS
+- **Style**: Python 3.8+, Google Docstrings, `black` formatting.
+- **Naming**: `snake_case` modules/funcs, `PascalCase` classes.
+- **Typing**: Full type hints required.
+- **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`).
+
+## ANTI-PATTERNS
+- **No Direct Schema Edits**: `libs/` content is upstream vendor data.
+- **Ignoring Rebuilds**: Must run `sv_to_ipxact --rebuild` after `libs/` changes.
+- **Untyped Code**: Avoid `Any` where specific types exist.
+- **Hardcoded Paths**: Use `os.path` or `pathlib` for cross-platform compatibility.
+
+## COMMANDS
+```bash
+# Setup
+make install-dev    # Create venv + install deps
+
+# Testing
+make test           # Unit tests
+make test-all       # Integration + Unit
+make test-cov       # Coverage report
+
+# Quality
+make lint           # Pylint
+make format         # Black
+
+# Runtime
+sv_to_ipxact -i input.sv -o output.xml
+sv_to_ipxact --rebuild  # Refresh protocol cache
+```
+
+## NOTES
+- **Cache**: Protocol definitions are cached in `.libs_cache.json`.
+- **Validation**: Requires internet for remote schema validation unless `--validate-local` used.
