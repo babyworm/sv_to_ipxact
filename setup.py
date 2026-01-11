@@ -14,6 +14,7 @@ setup(
             "sv-to-ipxact=sv_to_ipxact.main:main",
             "ipxact-converter=ipxact_version_converter.main:main",
             "validate-ipxact=sv_to_ipxact.validator:main",
+            "generate-diagram=diagram_tools.main:main",
         ],
     },
     python_requires=">=3.8",
