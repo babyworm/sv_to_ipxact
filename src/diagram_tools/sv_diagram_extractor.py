@@ -99,12 +99,14 @@ class SVDiagramExtractor:
             is_reset=self._is_reset_signal(port.name),
         )
 
-    def extract(self, sv_file: str, match_protocols: bool = True) -> DiagramBlock:
+    def extract(self, sv_file: str, match_protocols: bool = True,
+                expand_interfaces: bool = True) -> DiagramBlock:
         """Parse SV file and create DiagramBlock.
 
         Args:
             sv_file: Path to SystemVerilog file
             match_protocols: Whether to try matching bus protocols
+            expand_interfaces: If True, expand interfaces into individual signals
 
         Returns:
             DiagramBlock with extracted port information
@@ -131,29 +133,57 @@ class SVDiagramExtractor:
             # Match each group to protocols
             bus_interfaces, unmatched = self.matcher.match_all_groups(port_groups)
 
+            # Create a map of physical port names to PortDefinition for quick lookup
+            port_map = {port.name: port for port in module.ports}
+
             # Add matched bus interfaces
             for bus_if in bus_interfaces:
-                # Determine direction based on interface mode
-                if bus_if.interface_mode == 'master':
-                    direction = PortDirection.OUTPUT
+                # Skip reset interfaces - they should be treated as signals
+                if bus_if.protocol and 'reset' in bus_if.protocol.name.lower():
+                    # Don't add as interface, will be added as signal below
+                    continue
+
+                if expand_interfaces:
+                    # Expand interface into individual signals
+                    # Keep original port direction (don't override with interface mode)
+                    # Add each port in the interface as individual signal
+                    for logical_name, physical_name in bus_if.port_maps.items():
+                        if physical_name in port_map:
+                            port = port_map[physical_name]
+                            diagram_port = self._port_to_diagram_port(port)
+                            # Keep original direction from port definition
+                            # Force reset signals to be SIGNAL type
+                            if diagram_port.is_reset:
+                                diagram_port.port_type = PortType.SIGNAL
+                            diagram_ports.append(diagram_port)
+                            interface_port_names.add(physical_name)
                 else:
-                    direction = PortDirection.INPUT
+                    # Add as interface (original behavior)
+                    # Determine direction based on interface mode
+                    if bus_if.interface_mode == 'master':
+                        direction = PortDirection.OUTPUT
+                    else:
+                        direction = PortDirection.INPUT
 
-                diagram_ports.append(DiagramPort(
-                    name=bus_if.name,
-                    direction=direction,
-                    port_type=PortType.INTERFACE,
-                    signal_count=len(bus_if.port_maps),
-                    protocol_name=bus_if.protocol.name if bus_if.protocol else None,
-                ))
+                    diagram_ports.append(DiagramPort(
+                        name=bus_if.name,
+                        direction=direction,
+                        port_type=PortType.INTERFACE,
+                        signal_count=len(bus_if.port_maps),
+                        protocol_name=bus_if.protocol.name if bus_if.protocol else None,
+                    ))
 
-                # Track ports in this interface
-                interface_port_names.update(bus_if.port_maps.values())
+                    # Track ports in this interface
+                    interface_port_names.update(bus_if.port_maps.values())
 
             # Add unmatched ports
             for port in module.ports:
                 if port.name not in interface_port_names:
-                    diagram_ports.append(self._port_to_diagram_port(port))
+                    diagram_port = self._port_to_diagram_port(port)
+                    # Force reset signals to be SIGNAL type, not INTERFACE
+                    if diagram_port.is_reset:
+                        diagram_port.port_type = PortType.SIGNAL
+                    diagram_ports.append(diagram_port)
         else:
             # No protocol matching, just convert all ports
             for port in module.ports:

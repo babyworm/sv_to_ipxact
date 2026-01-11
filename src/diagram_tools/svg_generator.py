@@ -1,9 +1,10 @@
 """Generate SVG diagrams from DiagramBlock."""
 
 from xml.etree import ElementTree as ET
+from xml.dom import minidom
 from typing import List
 
-from .diagram_model import DiagramBlock, DiagramPort, DiagramConfig, PortType
+from .diagram_model import DiagramBlock, DiagramPort, DiagramConfig, PortType, PortDirection
 
 
 class SVGGenerator:
@@ -19,8 +20,22 @@ class SVGGenerator:
         """
         self.config = config or DiagramConfig()
 
+    def _estimate_text_width(self, text: str) -> float:
+        """Estimate text width in pixels based on font size and character count.
+
+        Args:
+            text: Text string to measure
+
+        Returns:
+            Estimated width in pixels
+        """
+        # Approximate: each character is about 0.6 * font_size wide
+        # Add some padding for safety
+        char_width = self.config.font_size * 0.6
+        return len(text) * char_width + 10
+
     def _calculate_dimensions(self, block: DiagramBlock) -> tuple:
-        """Calculate block dimensions based on port count.
+        """Calculate block dimensions based on port count and label lengths.
 
         Returns:
             Tuple of (block_width, block_height, total_width, total_height)
@@ -34,12 +49,28 @@ class SVGGenerator:
 
         block_width = self.config.block_min_width
 
-        total_width = (self.config.margin_left + block_width +
-                       self.config.margin_right)
+        # Calculate required margins based on longest labels
+        max_left_label_width = 0
+        for port in block.left_ports:
+            label_width = self._estimate_text_width(port.display_name)
+            max_left_label_width = max(max_left_label_width, label_width)
+
+        max_right_label_width = 0
+        for port in block.right_ports:
+            label_width = self._estimate_text_width(port.display_name)
+            max_right_label_width = max(max_right_label_width, label_width)
+
+        # Add port_stub_length and some padding
+        margin_left = max(self.config.margin_left,
+                         int(max_left_label_width) + self.config.port_stub_length + 20)
+        margin_right = max(self.config.margin_right,
+                          int(max_right_label_width) + self.config.port_stub_length + 20)
+
+        total_width = margin_left + block_width + margin_right
         total_height = (self.config.margin_top + block_height +
                         self.config.margin_bottom)
 
-        return block_width, block_height, total_width, total_height
+        return block_width, block_height, total_width, total_height, margin_left, margin_right
 
     def generate(self, block: DiagramBlock) -> str:
         """Generate SVG XML string.
@@ -51,13 +82,13 @@ class SVGGenerator:
             SVG XML as string
         """
         # Calculate dimensions
-        block_width, block_height, total_width, total_height = \
+        block_width, block_height, total_width, total_height, margin_left, margin_right = \
             self._calculate_dimensions(block)
 
         # Update block dimensions
         block.width = block_width
         block.height = block_height
-        block.x = self.config.margin_left
+        block.x = margin_left
         block.y = self.config.margin_top
 
         # Create SVG root with namespace
@@ -72,6 +103,9 @@ class SVGGenerator:
         # Add styles
         self._add_styles(svg)
 
+        # Add arrow markers
+        self._add_arrow_markers(svg)
+
         # Add main block
         self._add_block(svg, block)
 
@@ -79,8 +113,15 @@ class SVGGenerator:
         self._add_left_ports(svg, block)
         self._add_right_ports(svg, block)
 
-        # Generate XML string
-        return ET.tostring(svg, encoding='unicode', method='xml')
+        # Generate XML string with formatting
+        xml_string = ET.tostring(svg, encoding='unicode', method='xml')
+        # Format the XML for better readability
+        dom = minidom.parseString(xml_string)
+        formatted = dom.toprettyxml(indent='  ')
+        # Remove extra blank lines and XML declaration (will be added in write_to_file)
+        lines = [line for line in formatted.split('\n')
+                 if line.strip() and not line.strip().startswith('<?xml')]
+        return '\n'.join(lines)
 
     def write_to_file(self, block: DiagramBlock, output_path: str):
         """Write SVG to file.
@@ -135,7 +176,74 @@ class SVGGenerator:
             .interface-line {{
                 stroke-width: {self.config.interface_line_width}px;
             }}
+            .arrow-marker {{
+                fill: {self.config.port_stroke_color};
+            }}
         """
+
+    def _add_arrow_markers(self, svg: ET.Element):
+        """Add arrow marker definitions for input/output/inout."""
+        defs = ET.SubElement(svg, "defs")
+
+        # Arrow pointing right (for input and output)
+        marker_right = ET.SubElement(defs, "marker", {
+            "id": "arrow-right",
+            "markerWidth": "10",
+            "markerHeight": "10",
+            "refX": "9",
+            "refY": "3",
+            "orient": "auto",
+            "markerUnits": "strokeWidth"
+        })
+        path_right = ET.SubElement(marker_right, "path", {
+            "d": "M0,0 L0,6 L9,3 z",
+            "class": "arrow-marker"
+        })
+
+        # Arrow pointing left (for inout bidirectional)
+        marker_left = ET.SubElement(defs, "marker", {
+            "id": "arrow-left",
+            "markerWidth": "10",
+            "markerHeight": "10",
+            "refX": "1",
+            "refY": "3",
+            "orient": "auto",
+            "markerUnits": "strokeWidth"
+        })
+        path_left = ET.SubElement(marker_left, "path", {
+            "d": "M9,0 L9,6 L0,3 z",
+            "class": "arrow-marker"
+        })
+
+        # Small arrow for bidirectional (left side)
+        marker_bidir_left = ET.SubElement(defs, "marker", {
+            "id": "arrow-bidir-left",
+            "markerWidth": "6",
+            "markerHeight": "6",
+            "refX": "1",
+            "refY": "3",
+            "orient": "auto",
+            "markerUnits": "strokeWidth"
+        })
+        path_bidir_left = ET.SubElement(marker_bidir_left, "path", {
+            "d": "M5,0 L5,6 L0,3 z",
+            "class": "arrow-marker"
+        })
+
+        # Small arrow for bidirectional (right side)
+        marker_bidir_right = ET.SubElement(defs, "marker", {
+            "id": "arrow-bidir-right",
+            "markerWidth": "6",
+            "markerHeight": "6",
+            "refX": "5",
+            "refY": "3",
+            "orient": "auto",
+            "markerUnits": "strokeWidth"
+        })
+        path_bidir_right = ET.SubElement(marker_bidir_right, "path", {
+            "d": "M0,0 L0,6 L5,3 z",
+            "class": "arrow-marker"
+        })
 
     def _add_block(self, svg: ET.Element, block: DiagramBlock):
         """Add the main block rectangle with title."""
@@ -178,13 +286,24 @@ class SVGGenerator:
             x1 = block.x - self.config.port_stub_length
             x2 = block.x
 
-            ET.SubElement(svg, "line", {
+            # Determine arrow markers based on direction
+            line_attrs = {
                 "class": self._get_line_class(port),
                 "x1": str(x1),
                 "y1": str(y),
                 "x2": str(x2),
                 "y2": str(y),
-            })
+            }
+
+            if port.direction == PortDirection.INPUT:
+                # Input: arrow pointing right (into block)
+                line_attrs["marker-end"] = "url(#arrow-right)"
+            elif port.direction == PortDirection.INOUT:
+                # Inout: small arrows on both ends
+                line_attrs["marker-start"] = "url(#arrow-bidir-left)"
+                line_attrs["marker-end"] = "url(#arrow-bidir-right)"
+
+            ET.SubElement(svg, "line", line_attrs)
 
             # Port label
             label = ET.SubElement(svg, "text", {
@@ -206,13 +325,17 @@ class SVGGenerator:
             x1 = block.x + block.width
             x2 = x1 + self.config.port_stub_length
 
-            ET.SubElement(svg, "line", {
+            # Output: arrow pointing right (out of block)
+            line_attrs = {
                 "class": self._get_line_class(port),
                 "x1": str(x1),
                 "y1": str(y),
                 "x2": str(x2),
                 "y2": str(y),
-            })
+                "marker-end": "url(#arrow-right)",
+            }
+
+            ET.SubElement(svg, "line", line_attrs)
 
             # Port label
             label = ET.SubElement(svg, "text", {

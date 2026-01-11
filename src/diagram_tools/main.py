@@ -94,6 +94,12 @@ Output:
         help='Disable protocol matching for SV files'
     )
 
+    parser.add_argument(
+        '--no-expand-interfaces',
+        action='store_true',
+        help='Keep interfaces bundled (default: expand interfaces into individual signals)'
+    )
+
     # Styling options
     parser.add_argument(
         '--interface-width',
@@ -168,7 +174,8 @@ Output:
         if input_format == 'sv':
             extractor = SVDiagramExtractor(args.libs, args.cache)
             block = extractor.extract(args.input,
-                                       match_protocols=not args.no_match)
+                                       match_protocols=not args.no_match,
+                                       expand_interfaces=not args.no_expand_interfaces)
         else:
             extractor = IPXACTDiagramExtractor()
             block = extractor.extract(args.input)
