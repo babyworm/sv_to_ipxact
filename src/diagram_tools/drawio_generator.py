@@ -5,7 +5,7 @@ import base64
 import zlib
 from urllib.parse import quote
 
-from .diagram_model import DiagramBlock, DiagramPort, DiagramConfig, PortType
+from .diagram_model import DiagramBlock, DiagramPort, DiagramConfig, PortType, PortDirection
 
 
 class DrawioGenerator:
@@ -26,11 +26,25 @@ class DrawioGenerator:
         self.cell_id_counter += 1
         return cell_id
 
+    def _estimate_text_width(self, text: str) -> float:
+        """Estimate text width in pixels based on font size and character count.
+        
+        Args:
+            text: Text string to measure
+            
+        Returns:
+            Estimated width in pixels
+        """
+        # Approximate: each character is about 0.6 * font_size wide
+        # Add some padding for safety
+        char_width = self.config.font_size * 0.6
+        return len(text) * char_width + 10
+
     def _calculate_dimensions(self, block: DiagramBlock) -> tuple:
-        """Calculate block dimensions based on port count.
+        """Calculate block dimensions based on port count and label lengths.
 
         Returns:
-            Tuple of (block_width, block_height)
+            Tuple of (block_width, block_height, margin_left, margin_right)
         """
         left_count = len(block.left_ports)
         right_count = len(block.right_ports)
@@ -41,7 +55,24 @@ class DrawioGenerator:
 
         block_width = self.config.block_min_width
 
-        return block_width, block_height
+        # Calculate required margins based on longest labels
+        max_left_label_width = 0
+        for port in block.left_ports:
+            label_width = self._estimate_text_width(port.display_name)
+            max_left_label_width = max(max_left_label_width, label_width)
+
+        max_right_label_width = 0
+        for port in block.right_ports:
+            label_width = self._estimate_text_width(port.display_name)
+            max_right_label_width = max(max_right_label_width, label_width)
+
+        # Add port_stub_length and some padding
+        margin_left = max(self.config.margin_left,
+                         int(max_left_label_width) + self.config.port_stub_length + 20)
+        margin_right = max(self.config.margin_right,
+                          int(max_right_label_width) + self.config.port_stub_length + 20)
+
+        return block_width, block_height, margin_left, margin_right
 
     def generate(self, block: DiagramBlock) -> str:
         """Generate draw.io XML string.
@@ -56,12 +87,13 @@ class DrawioGenerator:
         self.cell_id_counter = 2
 
         # Calculate dimensions
-        block_width, block_height = self._calculate_dimensions(block)
+        block_width, block_height, margin_left, margin_right = \
+            self._calculate_dimensions(block)
 
         # Update block dimensions
         block.width = block_width
         block.height = block_height
-        block.x = self.config.margin_left
+        block.x = margin_left
         block.y = self.config.margin_top
 
         # Create root structure
@@ -161,8 +193,21 @@ class DrawioGenerator:
         else:
             stroke_width = self.config.signal_line_width
 
+        # Determine arrow style based on direction
+        if port.direction == PortDirection.INPUT:
+            # Input: arrow pointing right (into block)
+            arrow_style = "endArrow=classic;startArrow=none;"
+        elif port.direction == PortDirection.OUTPUT:
+            # Output: arrow pointing right (out of block)
+            arrow_style = "endArrow=classic;startArrow=none;"
+        elif port.direction == PortDirection.INOUT:
+            # Inout: arrows on both ends (smaller)
+            arrow_style = "endArrow=classic;startArrow=classic;"
+        else:
+            arrow_style = "endArrow=none;startArrow=none;"
+
         return (
-            "endArrow=none;"
+            f"{arrow_style}"
             "html=1;"
             f"strokeWidth={stroke_width};"
             f"strokeColor={self.config.port_stroke_color};"
